@@ -10,6 +10,7 @@ import Layout from '@/components/Layout';
 import Home from '@/pages/Home';
 import Orders from '@/pages/Orders';
 import Promotions from '@/pages/Promotions';
+import Admin from '@/pages/Admin';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -42,6 +43,7 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<Home />} />
         <Route path="/pedidos" element={<Orders />} />
         <Route path="/promociones" element={<Promotions />} />
+        <Route path="/admin" element={<Admin />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

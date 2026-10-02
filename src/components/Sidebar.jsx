@@ -1,16 +1,19 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { UtensilsCrossed, Home, ClipboardList, Tag, User, Clock } from 'lucide-react';
+import { UtensilsCrossed, Home as HomeIcon, ClipboardList, Tag, User, Clock, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const nav = [
-  { label: 'Menú', path: '/', icon: Home },
-  { label: 'Mis Pedidos', path: '/pedidos', icon: ClipboardList },
-  { label: 'Promociones', path: '/promociones', icon: Tag },
-];
+import { useAuth } from '@/lib/AuthContext';
 
 export default function Sidebar() {
   const location = useLocation();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+  const nav = [
+    { label: 'Menú', path: '/', icon: HomeIcon },
+    { label: 'Mis Pedidos', path: '/pedidos', icon: ClipboardList },
+    { label: 'Promociones', path: '/promociones', icon: Tag },
+    ...(isAdmin ? [{ label: 'Admin pedidos', path: '/admin', icon: ShieldCheck }] : []),
+  ];
   return (
     <aside className="fixed left-0 top-0 z-30 h-screen w-[240px] border-r border-hair bg-white flex flex-col">
       <div className="flex items-center gap-2.5 px-5 h-[72px] border-b border-hair">

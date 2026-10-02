@@ -4,6 +4,8 @@ import { CartProvider } from '@/lib/CartContext';
 import Sidebar from '@/components/Sidebar';
 import MobileHeader from '@/components/MobileHeader';
 import MobileCartBar from '@/components/MobileCartBar';
+import AgentChat from '@/components/AgentChat';
+import OrderAlerts from '@/components/OrderAlerts';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function Layout() {
@@ -17,6 +19,8 @@ export default function Layout() {
           <Outlet />
         </main>
         {isMobile && <MobileCartBar />}
+        <OrderAlerts />
+        <AgentChat />
       </div>
     </CartProvider>
   );

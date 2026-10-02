@@ -1,24 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import PromoCarousel from '@/components/PromoCarousel';
-import CategoryFilter from '@/components/CategoryFilter';
 import MenuCard from '@/components/MenuCard';
 import CheckoutPanel from '@/components/CheckoutPanel';
+import DaySelector, { todayWeekday } from '@/components/DaySelector';
 import { Loader2 } from 'lucide-react';
 
 export default function Home() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [category, setCategory] = useState('Todos');
+  const [day, setDay] = useState(todayWeekday());
 
   useEffect(() => {
-    base44.entities.MenuItem.filter({}, { sort: '-popular', limit: 50 })
+    base44.entities.MenuItem.filter({}, { sort: '-popular', limit: 100 })
       .then(res => setItems(res.items || []))
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = category === 'Todos' ? items : items.filter(i => i.category === category);
+  const { comida, bebidas, snacks, postres } = useMemo(() => {
+    const byDay = items.filter(i => i.category === 'Comida (diario)');
+    const comidaDia = byDay.filter(i => i.day_of_week === day);
+    return {
+      comida: comidaDia,
+      bebidas: items.filter(i => i.category === 'Bebidas'),
+      snacks: items.filter(i => i.category === 'Snacks'),
+      postres: items.filter(i => i.category === 'Postres'),
+    };
+  }, [items, day]);
 
   return (
     <div className="lg:flex">
@@ -32,15 +42,28 @@ export default function Home() {
           <PromoCarousel />
         </div>
 
-        <CategoryFilter active={category} onChange={setCategory} />
-
         {loading ? (
           <div className="grid place-items-center py-20">
             <Loader2 className="w-7 h-7 animate-spin text-brand" />
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4 mt-4">
-            {filtered.map(item => <MenuCard key={item.id} item={item} />)}
+          <div className="space-y-7">
+            <Section title="Comida del día" subtitle="Platillos que cambian cada día de la semana">
+              <DaySelector value={day} onChange={setDay} />
+              <Grid items={comida} empty="No hay comida programada para este día" />
+            </Section>
+
+            <Section title="Bebidas" subtitle="Siempre disponibles">
+              <Grid items={bebidas} />
+            </Section>
+
+            <Section title="Snacks" subtitle="Siempre disponibles">
+              <Grid items={snacks} />
+            </Section>
+
+            <Section title="Postres" subtitle="Siempre disponibles">
+              <Grid items={postres} />
+            </Section>
           </div>
         )}
       </div>
@@ -48,6 +71,31 @@ export default function Home() {
       <div className="hidden lg:block w-[340px] shrink-0 border-l border-hair bg-white sticky top-0 h-screen overflow-hidden">
         <CheckoutPanel />
       </div>
+    </div>
+  );
+}
+
+function Section({ title, subtitle, children }) {
+  return (
+    <section>
+      <div className="flex items-baseline justify-between mb-3">
+        <div>
+          <h2 className="font-display font-700 text-[19px] text-ink leading-none">{title}</h2>
+          {subtitle && <p className="text-[12px] text-mutedink mt-1">{subtitle}</p>}
+        </div>
+      </div>
+      <div className="mb-3">{children}</div>
+    </section>
+  );
+}
+
+function Grid({ items, empty }) {
+  if (!items || items.length === 0) {
+    return <p className="text-[13px] text-mutedink py-6 text-center bg-white rounded-2xl border border-dashed border-hair">{empty || 'Sin productos'}</p>;
+  }
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
+      {items.map(item => <MenuCard key={item.id} item={item} />)}
     </div>
   );
 }
