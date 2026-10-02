@@ -1,0 +1,53 @@
+{
+  "name": "MenuItem",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "price": {
+      "type": "number"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Antojitos",
+        "Bebidas",
+        "Snacks",
+        "Combos",
+        "Postres"
+      ]
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "stock": {
+      "type": "number",
+      "default": 0
+    },
+    "prep_time": {
+      "type": "string",
+      "default": "5 min"
+    },
+    "is_combo": {
+      "type": "boolean",
+      "default": false
+    },
+    "discount": {
+      "type": "number",
+      "default": 0
+    },
+    "popular": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "name",
+    "price",
+    "category"
+  ]
+}

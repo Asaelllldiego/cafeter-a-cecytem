@@ -1,0 +1,30 @@
+{
+  "name": "Promotion",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "subtitle": {
+      "type": "string"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "badge": {
+      "type": "string"
+    },
+    "accent": {
+      "type": "string",
+      "enum": [
+        "mustard",
+        "brand"
+      ],
+      "default": "mustard"
+    }
+  },
+  "required": [
+    "title",
+    "subtitle"
+  ]
+}
