@@ -12,6 +12,9 @@ import Orders from '@/pages/Orders';
 import Promotions from '@/pages/Promotions';
 import Admin from '@/pages/Admin';
 import Faq from '@/pages/Faq';
+import Perfil from '@/pages/Perfil';
+import Reportes from '@/pages/Reportes';
+import ProductDetail from '@/pages/ProductDetail';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -46,6 +49,9 @@ const AuthenticatedApp = () => {
         <Route path="/promociones" element={<Promotions />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/faq" element={<Faq />} />
+        <Route path="/perfil" element={<Perfil />} />
+        <Route path="/admin/reportes" element={<Reportes />} />
+        <Route path="/producto/:id" element={<ProductDetail />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

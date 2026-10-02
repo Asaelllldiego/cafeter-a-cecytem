@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Plus, Clock, Flame } from 'lucide-react';
 import { useCart } from '@/lib/CartContext';
 import { cn } from '@/lib/utils';
@@ -49,7 +50,9 @@ export default function MenuCard({ item }) {
 
       <div className="p-3.5">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-display font-600 text-[15px] text-ink leading-snug">{item.name}</h3>
+          <h3 className="font-display font-600 text-[15px] text-ink leading-snug">
+            <Link to={`/producto/${item.id}`} className="hover:text-brand transition-colors">{item.name}</Link>
+          </h3>
           <span className="flex items-center gap-1 text-[11px] text-mutedink shrink-0 mt-0.5">
             <Clock className="w-3 h-3" />{item.prep_time}
           </span>

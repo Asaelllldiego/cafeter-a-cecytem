@@ -62,6 +62,13 @@
     "emoji": {
       "type": "string",
       "default": ""
+    },
+    "ingredients": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
     }
   },
   "required": [

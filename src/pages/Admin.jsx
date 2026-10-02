@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Loader2, ClipboardList, Clock, ChefHat, CheckCircle2, XCircle, RefreshCw, Lock, Tags, Package } from 'lucide-react';
+import { Loader2, ClipboardList, Clock, ChefHat, CheckCircle2, XCircle, RefreshCw, Lock, Tags, Package, BarChart3 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import AdminProducts from '@/components/AdminProducts';
 
@@ -84,9 +85,14 @@ export default function Admin() {
           </h1>
           <p className="text-[13px] text-mutedink mt-1">Administra y actualiza el estado de los pedidos en tiempo real</p>
         </div>
-        <button onClick={load} className="grid place-items-center w-10 h-10 rounded-full border border-hair bg-white hover:bg-muted">
-          <RefreshCw className={cn('w-[18px] h-[18px] text-ink', loading && 'animate-spin')} />
-        </button>
+        <div className="flex items-center gap-2">
+          <Link to="/admin/reportes" className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-pill bg-brand-light text-brand text-[12px] font-600 hover:bg-brand hover:text-white transition-colors">
+            <BarChart3 className="w-4 h-4" /> Reportes
+          </Link>
+          <button onClick={load} className="grid place-items-center w-10 h-10 rounded-full border border-hair bg-white hover:bg-muted">
+            <RefreshCw className={cn('w-[18px] h-[18px] text-ink', loading && 'animate-spin')} />
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-2 mb-5">

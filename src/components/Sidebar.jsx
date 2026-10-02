@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { UtensilsCrossed, Home as HomeIcon, ClipboardList, Tag, User, Clock, ShieldCheck, HelpCircle } from 'lucide-react';
+import { UtensilsCrossed, Home as HomeIcon, ClipboardList, Tag, User, Clock, ShieldCheck, HelpCircle, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/AuthContext';
 
@@ -13,7 +13,8 @@ export default function Sidebar() {
     { label: 'Mis Pedidos', path: '/pedidos', icon: ClipboardList },
     { label: 'Promociones', path: '/promociones', icon: Tag },
     { label: 'Preguntas frecuentes', path: '/faq', icon: HelpCircle },
-    ...(isAdmin ? [{ label: 'Admin pedidos', path: '/admin', icon: ShieldCheck }] : []),
+    { label: 'Mi perfil', path: '/perfil', icon: User },
+    ...(isAdmin ? [{ label: 'Admin pedidos', path: '/admin', icon: ShieldCheck }, { label: 'Reportes', path: '/admin/reportes', icon: BarChart3 }] : []),
   ];
   return (
     <aside className="fixed left-0 top-0 z-30 h-screen w-[240px] border-r border-hair bg-white flex flex-col">
