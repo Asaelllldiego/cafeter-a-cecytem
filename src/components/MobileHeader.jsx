@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { UtensilsCrossed, Search, ShieldCheck } from 'lucide-react';
+import { UtensilsCrossed, Search, ShieldCheck, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 
 export default function MobileHeader() {
@@ -24,6 +24,9 @@ export default function MobileHeader() {
               <ShieldCheck className="w-5 h-5" />
             </Link>
           )}
+          <Link to="/faq" className="grid place-items-center w-10 h-10 rounded-full hover:bg-muted text-ink">
+            <HelpCircle className="w-5 h-5" />
+          </Link>
           <button className="grid place-items-center w-10 h-10 rounded-full hover:bg-muted text-ink">
             <Search className="w-5 h-5" />
           </button>

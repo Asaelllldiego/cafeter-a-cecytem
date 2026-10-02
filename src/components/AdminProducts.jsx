@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Loader2, RefreshCw, Plus, Pencil, Search, Trash2, X } from 'lucide-react';
+import { Loader2, RefreshCw, Plus, Pencil, Search, Trash2, X, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 
@@ -47,6 +47,12 @@ export default function AdminProducts() {
   const toggleAvailable = async (item) => {
     setItems(prev => prev.map(i => i.id === item.id ? { ...i, available: !i.available } : i));
     try { await base44.entities.MenuItem.update(item.id, { available: !item.available }); } catch (e) { load(); }
+  };
+
+  const updateStock = async (item, delta) => {
+    const next = Math.max(0, (Number(item.stock) || 0) + delta);
+    setItems(prev => prev.map(i => i.id === item.id ? { ...i, stock: next } : i));
+    try { await base44.entities.MenuItem.update(item.id, { stock: next }); } catch (e) { load(); }
   };
 
   const remove = async (item) => {
@@ -100,6 +106,18 @@ export default function AdminProducts() {
                   <p className="font-display font-600 text-[14px] text-ink truncate">{item.name}</p>
                   <p className="text-[11px] text-mutedink">{item.category}</p>
                   <p className="font-display font-700 text-[15px] text-brand mt-0.5">${(item.price || 0).toFixed(2)}</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between mt-2.5">
+                <span className="text-[10px] font-600 uppercase tracking-wide text-mutedink">Stock</span>
+                <div className="flex items-center gap-1.5">
+                  <button onClick={() => updateStock(item, -1)} className="grid place-items-center w-6 h-6 rounded-full border border-hair hover:bg-muted">
+                    <Minus className="w-3 h-3" />
+                  </button>
+                  <span className={cn('w-8 text-center text-[13px] font-700', (Number(item.stock) || 0) === 0 && 'text-destructive')}>{item.stock ?? 0}</span>
+                  <button onClick={() => updateStock(item, 1)} className="grid place-items-center w-6 h-6 rounded-full border border-hair hover:bg-muted">
+                    <Plus className="w-3 h-3" />
+                  </button>
                 </div>
               </div>
               <div className="flex items-center justify-between mt-3">

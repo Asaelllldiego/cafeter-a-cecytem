@@ -89,6 +89,19 @@ export default function Admin() {
         </button>
       </div>
 
+      <div className="flex gap-2 mb-5">
+        <button onClick={() => setTab('pedidos')}
+          className={cn('inline-flex items-center gap-1.5 px-4 py-2 rounded-pill text-[13px] font-600',
+            tab === 'pedidos' ? 'bg-brand text-white' : 'bg-white border border-hair text-ink')}>
+          <ClipboardList className="w-4 h-4" /> Pedidos
+        </button>
+        <button onClick={() => setTab('productos')}
+          className={cn('inline-flex items-center gap-1.5 px-4 py-2 rounded-pill text-[13px] font-600',
+            tab === 'productos' ? 'bg-brand text-white' : 'bg-white border border-hair text-ink')}>
+          <Package className="w-4 h-4" /> Productos
+        </button>
+      </div>
+
       {tab === 'productos' ? (
         <AdminProducts />
       ) : (
