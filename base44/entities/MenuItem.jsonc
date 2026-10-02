@@ -14,11 +14,20 @@
     "category": {
       "type": "string",
       "enum": [
-        "Antojitos",
+        "Comida (diario)",
         "Bebidas",
         "Snacks",
-        "Combos",
         "Postres"
+      ]
+    },
+    "day_of_week": {
+      "type": "string",
+      "enum": [
+        "Lunes",
+        "Martes",
+        "Mi\u00e9rcoles",
+        "Jueves",
+        "Viernes"
       ]
     },
     "image_url": {
@@ -26,7 +35,7 @@
     },
     "stock": {
       "type": "number",
-      "default": 0
+      "default": 50
     },
     "prep_time": {
       "type": "string",
