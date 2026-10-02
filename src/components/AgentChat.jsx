@@ -24,9 +24,10 @@ export default function AgentChat() {
     let unsub = () => {};
     (async () => {
       try {
-        const list = base44.agents.listConversations({ agent_name: AGENT_NAME });
-        const existing = Array.isArray(list) ? list[0] : null;
-        const conversation = existing || base44.agents.createConversation({ agent_name: AGENT_NAME, metadata: { name: 'Cafetería CECYTEM' } });
+        const list = await base44.agents.listConversations({ agent_name: AGENT_NAME });
+        const listArr = Array.isArray(list) ? list : (list?.items || []);
+        const existing = listArr[0];
+        const conversation = existing || await base44.agents.createConversation({ agent_name: AGENT_NAME, metadata: { name: 'Cafetería CECYTEM' } });
         setConv(conversation);
         setMessages(conversation.messages && conversation.messages.length ? conversation.messages : [{ role: 'assistant', content: GREETING }]);
         unsub = base44.agents.subscribeToConversation(conversation.id, (data) => {
