@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Loader2, ClipboardList, Clock, ChefHat, CheckCircle2, XCircle, RefreshCw, Lock, Tags } from 'lucide-react';
+import { Loader2, ClipboardList, Clock, ChefHat, CheckCircle2, XCircle, RefreshCw, Lock, Tags, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import AdminProducts from '@/components/AdminProducts';
 
 const STATUS = [
   { key: 'pendiente', label: 'Pendiente', icon: Clock, cls: 'bg-amber-100 text-amber-700' },
@@ -19,6 +20,7 @@ export default function Admin() {
   const [counts, setCounts] = useState({});
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('pendiente');
+  const [tab, setTab] = useState('pedidos');
 
   const load = async () => {
     setLoading(true);
@@ -87,6 +89,10 @@ export default function Admin() {
         </button>
       </div>
 
+      {tab === 'productos' ? (
+        <AdminProducts />
+      ) : (
+      <>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
         <Stat label="Pendientes" value={counts.pendiente || 0} icon={Clock} cls="bg-amber-50 text-amber-700" />
         <Stat label="En preparación" value={counts.en_preparacion || 0} icon={ChefHat} cls="bg-blue-50 text-blue-700" />
@@ -115,6 +121,8 @@ export default function Admin() {
         <div className="space-y-3">
           {orders.map(o => <OrderRow key={o.id} order={o} onStatus={setStatus} />)}
         </div>
+      )}
+      </>
       )}
     </div>
   );

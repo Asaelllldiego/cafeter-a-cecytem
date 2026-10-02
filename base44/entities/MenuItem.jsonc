@@ -16,6 +16,8 @@
       "enum": [
         "Comida (diario)",
         "Bebidas",
+        "Especiales",
+        "Higiene",
         "Snacks",
         "Postres"
       ]
@@ -52,6 +54,14 @@
     "popular": {
       "type": "boolean",
       "default": false
+    },
+    "available": {
+      "type": "boolean",
+      "default": true
+    },
+    "emoji": {
+      "type": "string",
+      "default": ""
     }
   },
   "required": [

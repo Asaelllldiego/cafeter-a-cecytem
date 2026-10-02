@@ -6,8 +6,14 @@ import { cn } from '@/lib/utils';
 export default function MenuCard({ item }) {
   const { addItem } = useCart();
   const [pulsed, setPulsed] = useState(false);
-  const outOfStock = item.stock <= 0;
-  const lowStock = item.stock > 0 && item.stock <= 3;
+  const outOfStock = item.available === false || item.stock <= 0;
+  const lowStock = item.available !== false && item.stock > 0 && item.stock <= 3;
+  const fallbackEmoji = item.emoji || (item.category === 'Bebidas' ? '🥤'
+    : item.category === 'Especiales' ? '⭐'
+    : item.category === 'Higiene' ? '🧴'
+    : item.category === 'Postres' ? '🍰'
+    : item.category === 'Snacks' ? '🍪'
+    : '🍽️');
 
   const handleAdd = () => {
     if (outOfStock) return;
@@ -22,7 +28,7 @@ export default function MenuCard({ item }) {
         {item.image_url ? (
           <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full grid place-items-center text-mutedink text-3xl">🍽️</div>
+          <div className="w-full h-full grid place-items-center text-mutedink text-3xl">{fallbackEmoji}</div>
         )}
         <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
           {item.popular && (

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useCart } from '@/lib/CartContext';
 import { base44 } from '@/api/base44Client';
-import { Trash2, Minus, Plus, Clock, Loader2, CheckCircle2, Tag } from 'lucide-react';
+import { Trash2, Minus, Plus, Clock, Loader2, CheckCircle2, Tag, Clock4 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { isWithinSchedule, SCHEDULE_TEXT } from '@/components/ScheduleBadge';
 
 const pickupOptions = ['Receso 1', 'Receso 2', 'Personalizado'];
 
@@ -39,6 +40,8 @@ export default function CheckoutPanel({ onDone, mobile }) {
       setLoading(false);
     }
   };
+
+  const open = isWithinSchedule();
 
   if (success) {
     return (
@@ -90,6 +93,13 @@ export default function CheckoutPanel({ onDone, mobile }) {
         ))}
       </div>
 
+      {items.length > 0 && !open && (
+        <div className="mx-5 mt-3 px-3.5 py-3 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-2">
+          <Clock4 className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <p className="text-[12px] text-amber-800 leading-relaxed">Estamos fuera de horario. Nuestro horario de atención es de {SCHEDULE_TEXT}.</p>
+        </div>
+      )}
+
       {items.length > 0 && (
         <div className="px-5 py-4 border-t border-hair space-y-3.5">
           <div>
@@ -131,10 +141,11 @@ export default function CheckoutPanel({ onDone, mobile }) {
             </div>
           </div>
 
-          <button onClick={handleConfirm} disabled={loading}
-            className="w-full py-3.5 rounded-pill bg-brand text-white font-display font-700 text-[15px] hover:bg-brand-dark disabled:opacity-60 flex items-center justify-center gap-2">
-            {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> Confirmando...</> : <><Tag className="w-4 h-4" /> Confirmar Pedido</>}
+          <button onClick={handleConfirm} disabled={loading || !open}
+            className="w-full py-3.5 rounded-pill bg-brand text-white font-display font-700 text-[15px] hover:bg-brand-dark disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> Confirmando...</> : <><Tag className="w-4 h-4" /> {open ? 'Confirmar Pedido' : 'Fuera de horario'}</>}
           </button>
+          {!open && <p className="text-center text-[11px] text-mutedink">Reanudamos ventas a las 7:00 AM</p>}
         </div>
       )}
     </div>
