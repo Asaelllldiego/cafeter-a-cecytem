@@ -10,6 +10,7 @@ export default function Reportes() {
   const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState('dia');
 
   useEffect(() => {
     base44.entities.Order.filter({ status: { $ne: 'cancelado' } }, { sort: '-created_date', limit: 500 })
@@ -18,31 +19,50 @@ export default function Reportes() {
       .finally(() => setLoading(false));
   }, []);
 
+  const windowOrders = useMemo(() => {
+    if (!orders.length) return [];
+    const now = new Date();
+    const start = new Date(now);
+    if (period === 'dia') start.setDate(now.getDate() - 14);
+    else if (period === 'semana') start.setDate(now.getDate() - 56);
+    else start.setMonth(now.getMonth() - 6);
+    return orders.filter(o => o.created_date && new Date(o.created_date) >= start);
+  }, [orders, period]);
+
   const stats = useMemo(() => {
-    const totalRevenue = orders.reduce((s, o) => s + (o.total || 0), 0);
-    const totalOrders = orders.length;
-    const totalItems = orders.reduce((s, o) => s + (o.items || []).reduce((a, i) => a + (i.quantity || 0), 0), 0);
+    const totalRevenue = windowOrders.reduce((s, o) => s + (o.total || 0), 0);
+    const totalOrders = windowOrders.length;
+    const totalItems = windowOrders.reduce((s, o) => s + (o.items || []).reduce((a, i) => a + (i.quantity || 0), 0), 0);
     const avgTicket = totalOrders ? totalRevenue / totalOrders : 0;
     return { totalRevenue, totalOrders, totalItems, avgTicket };
-  }, [orders]);
+  }, [windowOrders]);
 
-  const dailyData = useMemo(() => {
+  const periodData = useMemo(() => {
     const map = {};
-    orders.forEach(o => {
+    const order = [];
+    windowOrders.forEach(o => {
       if (!o.created_date) return;
       const d = new Date(o.created_date);
-      const key = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
-      map[key] = (map[key] || 0) + (o.total || 0);
+      let key;
+      if (period === 'dia') {
+        key = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+      } else if (period === 'semana') {
+        const monday = new Date(d);
+        monday.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+        key = `${String(monday.getDate()).padStart(2, '0')}/${String(monday.getMonth() + 1).padStart(2, '0')}`;
+      } else {
+        key = d.toLocaleString('es-MX', { month: 'short' });
+      }
+      if (!(key in map)) { map[key] = 0; order.push(key); }
+      map[key] += (o.total || 0);
     });
-    return Object.entries(map)
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .slice(-14)
-      .map(([dia, total]) => ({ dia, total: Math.round(total * 100) / 100 }));
-  }, [orders]);
+    return order
+      .map(label => ({ label, total: Math.round(map[label] * 100) / 100 }));
+  }, [windowOrders, period]);
 
   const topProducts = useMemo(() => {
     const map = {};
-    orders.forEach(o => (o.items || []).forEach(i => {
+    windowOrders.forEach(o => (o.items || []).forEach(i => {
       const name = i.name || 'Sin nombre';
       map[name] = (map[name] || 0) + (i.quantity || 0);
     }));
@@ -50,14 +70,14 @@ export default function Reportes() {
       .map(([name, cantidad]) => ({ name, cantidad }))
       .sort((a, b) => b.cantidad - a.cantidad)
       .slice(0, 6);
-  }, [orders]);
+  }, [windowOrders]);
 
   const statusData = useMemo(() => {
     const labels = { pendiente: 'Pendiente', en_preparacion: 'En preparación', listo: 'Listo', entregado: 'Entregado' };
     const map = {};
-    orders.forEach(o => { map[o.status] = (map[o.status] || 0) + 1; });
+    windowOrders.forEach(o => { map[o.status] = (map[o.status] || 0) + 1; });
     return Object.entries(map).map(([k, v]) => ({ name: labels[k] || k, value: v }));
-  }, [orders]);
+  }, [windowOrders]);
 
   if (!user || user.role !== 'admin') {
     return (
@@ -80,7 +100,24 @@ export default function Reportes() {
       <h1 className="font-display font-700 text-[26px] text-ink leading-tight flex items-center gap-2">
         <BarChart3 className="w-7 h-7 text-brand" /> Reportes de ventas
       </h1>
-      <p className="text-[13px] text-mutedink mt-1 mb-6">Resumen de ventas, productos más vendidos y ganancias diarias.</p>
+      <p className="text-[13px] text-mutedink mt-1 mb-4">Resumen de ventas, productos más vendidos y ganancias.</p>
+
+      {/* Filtro por periodo */}
+      <div className="flex items-center gap-2 mb-6 flex-wrap">
+        {[
+          { key: 'dia', label: 'Diario' },
+          { key: 'semana', label: 'Semanal' },
+          { key: 'mes', label: 'Mensual' },
+        ].map(p => (
+          <button key={p.key} onClick={() => setPeriod(p.key)}
+            className={`px-3.5 py-1.5 rounded-pill text-[12px] font-600 transition-colors ${period === p.key ? 'bg-brand text-white' : 'bg-white border border-hair text-ink hover:border-brand/40'}`}>
+            {p.label}
+          </button>
+        ))}
+        <span className="ml-auto text-[11px] text-mutedink hidden sm:block">
+          {period === 'dia' ? 'Últimos 14 días' : period === 'semana' ? 'Últimas 8 semanas' : 'Últimos 6 meses'}
+        </span>
+      </div>
 
       {/* Tarjetas resumen */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
@@ -91,12 +128,12 @@ export default function Reportes() {
       </div>
 
       {/* Ganancias diarias */}
-      <Card title="Ganancias diarias" subtitle="Últimos 14 días con ventas" icon={Calendar}>
-        {dailyData.length === 0 ? (
+      <Card title="Ganancias" subtitle={period === 'dia' ? 'Por día' : period === 'semana' ? 'Por semana' : 'Por mes'} icon={Calendar}>
+        {periodData.length === 0 ? (
           <Empty />
         ) : (
           <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={dailyData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+            <AreaChart data={periodData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
               <defs>
                 <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#006B3F" stopOpacity={0.35} />
@@ -104,7 +141,7 @@ export default function Reportes() {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#E0E4DE" vertical={false} />
-              <XAxis dataKey="dia" tick={{ fontSize: 11, fill: '#6F7972' }} tickLine={false} axisLine={false} />
+              <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#6F7972' }} tickLine={false} axisLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#6F7972' }} tickLine={false} axisLine={false} />
               <Tooltip formatter={v => `$${Number(v).toFixed(2)}`} contentStyle={{ borderRadius: 12, border: '1px solid #E0E4DE', fontSize: 12 }} />
               <Area type="monotone" dataKey="total" stroke="#006B3F" strokeWidth={2.5} fill="url(#grad)" />
