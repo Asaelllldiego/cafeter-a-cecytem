@@ -11,7 +11,7 @@ export default function MobileCartBar() {
   return (
     <>
       <button onClick={() => setOpen(true)}
-        className="fixed bottom-4 left-4 right-4 z-40 flex items-center justify-between px-5 py-3.5 rounded-pill bg-brand text-white shadow-float active:scale-[0.98] transition-transform">
+        className="fixed bottom-[76px] left-4 right-4 z-40 flex items-center justify-between px-5 py-3.5 rounded-pill bg-brand text-white shadow-float active:scale-[0.98] transition-transform">
         <span className="flex items-center gap-2.5">
           <span className="relative">
             <ShoppingBag className="w-5 h-5" />
