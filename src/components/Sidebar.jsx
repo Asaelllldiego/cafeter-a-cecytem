@@ -10,7 +10,7 @@ export default function Sidebar() {
   const isAdmin = user?.role === 'admin';
   const nav = [
     { label: 'Menú', path: '/', icon: HomeIcon },
-    { label: 'Mis Pedidos', path: '/pedidos', icon: ClipboardList },
+    ...(!isAdmin ? [{ label: 'Mis Pedidos', path: '/pedidos', icon: ClipboardList }] : []),
     { label: 'Promociones', path: '/promociones', icon: Tag },
     { label: 'Preguntas frecuentes', path: '/faq', icon: HelpCircle },
     { label: 'Mi perfil', path: '/perfil', icon: User },

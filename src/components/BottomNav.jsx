@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home as HomeIcon, ClipboardList, Tag, User } from 'lucide-react';
+import { Home as HomeIcon, ClipboardList, Tag, User, ShieldCheck } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { cn } from '@/lib/utils';
 
 const ACTIVE_STATUSES = ['pendiente', 'en_preparacion', 'listo'];
 
 export default function BottomNav() {
   const location = useLocation();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const [activeCount, setActiveCount] = useState(0);
 
   const load = async () => {
@@ -26,12 +29,19 @@ export default function BottomNav() {
     return unsub;
   }, []);
 
-  const items = [
+  const userItems = [
     { label: 'Menú', path: '/', icon: HomeIcon },
     { label: 'Mis Pedidos', path: '/pedidos', icon: ClipboardList, badge: activeCount },
     { label: 'Promociones', path: '/promociones', icon: Tag },
     { label: 'Perfil', path: '/perfil', icon: User },
   ];
+  const adminItems = [
+    { label: 'Menú', path: '/', icon: HomeIcon },
+    { label: 'Admin', path: '/admin', icon: ShieldCheck, badge: activeCount },
+    { label: 'Reportes', path: '/admin/reportes', icon: Tag },
+    { label: 'Perfil', path: '/perfil', icon: User },
+  ];
+  const items = isAdmin ? adminItems : userItems;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-hair pb-[env(safe-area-inset-bottom)]">

@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import Layout from '@/components/Layout';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import Home from '@/pages/Home';
 import Orders from '@/pages/Orders';
 import Promotions from '@/pages/Promotions';
@@ -15,6 +16,11 @@ import Faq from '@/pages/Faq';
 import Perfil from '@/pages/Perfil';
 import Reportes from '@/pages/Reportes';
 import ProductDetail from '@/pages/ProductDetail';
+import Login from '@/pages/Login';
+import Register from '@/pages/Register';
+import ForgotPassword from '@/pages/ForgotPassword';
+import ResetPassword from '@/pages/ResetPassword';
+import { Navigate } from 'react-router-dom';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -30,28 +36,28 @@ const AuthenticatedApp = () => {
   }
 
   // Handle authentication errors
-  if (authError) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
-      navigateToLogin();
-      return null;
-    }
+  if (authError?.type === 'user_not_registered') {
+    return <UserNotRegisteredError />;
   }
 
   // Render the main app
   return (
     <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/pedidos" element={<Orders />} />
-        <Route path="/promociones" element={<Promotions />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/faq" element={<Faq />} />
-        <Route path="/perfil" element={<Perfil />} />
-        <Route path="/admin/reportes" element={<Reportes />} />
-        <Route path="/producto/:id" element={<ProductDetail />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/pedidos" element={<Orders />} />
+          <Route path="/promociones" element={<Promotions />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/faq" element={<Faq />} />
+          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/admin/reportes" element={<Reportes />} />
+          <Route path="/producto/:id" element={<ProductDetail />} />
+        </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { Clock, Package, CheckCircle2, ChefHat, Loader2, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -12,15 +14,20 @@ const statusConfig = {
 };
 
 export default function Orders() {
+  const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    base44.entities.Order.filter({}, { sort: '-created_date', limit: 50 })
+    if (!user || user.role === 'admin') return;
+    base44.entities.Order.filter({ created_by_id: user.id }, { sort: '-created_date', limit: 50 })
       .then(res => setOrders(res.items || []))
       .catch(() => setOrders([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [user]);
+
+  // El administrador no usa la sección de pedidos personales
+  if (user?.role === 'admin') return <Navigate to="/admin" replace />;
 
   return (
     <div className="px-4 lg:px-8 py-5 lg:py-7 max-w-3xl">
