@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Clock, Package, CheckCircle2, ChefHat, Loader2, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import PullToRefresh from '@/components/PullToRefresh';
 
 const statusConfig = {
   pendiente: { label: 'Pendiente', icon: Clock, color: 'text-mustard-dark', bg: 'bg-mustard-light' },
@@ -15,21 +17,19 @@ const statusConfig = {
 
 export default function Orders() {
   const { user } = useAuth();
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!user || user.role === 'admin') return;
-    base44.entities.Order.filter({ created_by_id: user.id }, { sort: '-created_date', limit: 50 })
-      .then(res => setOrders(res.items || []))
-      .catch(() => setOrders([]))
-      .finally(() => setLoading(false));
-  }, [user]);
+  const queryClient = useQueryClient();
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ['myOrders', user?.id],
+    queryFn: () => base44.entities.Order.filter({ created_by_id: user.id }, { sort: '-created_date', limit: 50 }).then(r => r.items || []),
+    enabled: !!user && user.role !== 'admin',
+  });
+  const orders = data || [];
 
   // El administrador no usa la sección de pedidos personales
   if (user?.role === 'admin') return <Navigate to="/admin" replace />;
 
   return (
+    <PullToRefresh onRefresh={async () => { await queryClient.invalidateQueries({ queryKey: ['myOrders'] }); }}>
     <div className="px-4 lg:px-8 py-5 lg:py-7 max-w-3xl">
       <h1 className="font-display font-700 text-[28px] lg:text-[32px] text-ink mb-1">Mis Pedidos</h1>
       <p className="text-[14px] text-mutedink mb-6">Rastrea tus pedidos activos y programados</p>
@@ -85,5 +85,6 @@ export default function Orders() {
         </div>
       )}
     </div>
+    </PullToRefresh>
   );
 }

@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Loader2, User, Mail, GraduationCap, Phone, Bell, Tag, Save, Check, ShieldCheck, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import MobileSelect from '@/components/MobileSelect';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 
 export default function Perfil() {
@@ -74,20 +74,20 @@ export default function Perfil() {
 
   return (
     <div className="px-4 lg:px-8 py-5 lg:py-7 max-w-3xl mx-auto">
-      <h1 className="font-display font-700 text-[26px] text-ink leading-tight mb-1">Mi perfil</h1>
-      <p className="text-[13px] text-mutedink mb-6">Revisa tu información y ajusta tus preferencias.</p>
+      <h1 className="font-display font-700 text-[26px] text-foreground leading-tight mb-1">Mi perfil</h1>
+      <p className="text-[13px] text-muted-foreground mb-6">Revisa tu información y ajusta tus preferencias.</p>
 
       {/* Identidad */}
-      <div className="bg-white rounded-2xl border border-hair p-5 shadow-card mb-5">
+      <div className="bg-card rounded-2xl border border-border p-5 shadow-card mb-5">
         <div className="flex items-center gap-4">
           <div className="grid place-items-center w-16 h-16 rounded-full bg-brand-light text-brand">
             <User className="w-7 h-7" />
           </div>
           <div className="min-w-0">
-            <p className="font-display font-700 text-[20px] text-ink truncate">{user?.full_name || 'Estudiante'}</p>
-            <p className="text-[13px] text-mutedink flex items-center gap-1.5 truncate"><Mail className="w-3.5 h-3.5" /> {user?.email || '—'}</p>
+            <p className="font-display font-700 text-[20px] text-foreground truncate">{user?.full_name || 'Estudiante'}</p>
+            <p className="text-[13px] text-muted-foreground flex items-center gap-1.5 truncate"><Mail className="w-3.5 h-3.5" /> {user?.email || '—'}</p>
             <span className={cn('inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-pill text-[10px] font-700',
-              isAdmin ? 'bg-brand text-white' : 'bg-muted text-ink')}>
+              isAdmin ? 'bg-brand text-white' : 'bg-muted text-foreground')}>
               {isAdmin ? <><ShieldCheck className="w-3 h-3" /> Administrador</> : 'Estudiante'}
             </span>
           </div>
@@ -106,13 +106,8 @@ export default function Perfil() {
               className={inputCls} />
           </Field>
           <Field label="Turno">
-            <Select value={form.shift} onValueChange={v => update('shift', v)}>
-              <SelectTrigger className={inputCls}><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Matutino">Matutino</SelectItem>
-                <SelectItem value="Vespertino">Vespertino</SelectItem>
-              </SelectContent>
-            </Select>
+            <MobileSelect value={form.shift} onValueChange={v => update('shift', v)} className={inputCls} placeholder="Turno"
+              options={[{ value: 'Matutino', label: 'Matutino' }, { value: 'Vespertino', label: 'Vespertino' }]} />
           </Field>
           <Field label="Matrícula">
             <input value={form.student_id} onChange={e => update('student_id', e.target.value)} placeholder="Ej. 2026-001"
@@ -125,7 +120,7 @@ export default function Perfil() {
       <Section title="Contacto" icon={Phone} subtitle="Cómo podemos contactarte">
         <Field label="Teléfono / WhatsApp">
           <div className="relative">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mutedink" />
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input value={form.phone} onChange={e => update('phone', e.target.value)} placeholder="Ej. 55 1234 5678"
               className={cn(inputCls, 'pl-9')} />
           </div>
@@ -175,7 +170,10 @@ export default function Perfil() {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={async () => { try { await base44.auth.logout('/login'); } catch (e) { window.location.href = '/login'; } }}
+              onClick={async () => {
+                try { await base44.functions.invoke('deleteMyAccount', {}); } catch (e) { /* borrado best-effort */ }
+                try { await base44.auth.logout('/login'); } catch (e) { window.location.href = '/login'; }
+              }}
             >
               Sí, eliminar
             </AlertDialogAction>
@@ -186,16 +184,16 @@ export default function Perfil() {
   );
 }
 
-const inputCls = 'w-full px-3 py-2.5 rounded-xl border border-hair bg-white text-[13px] focus:outline-none focus:border-brand';
+const inputCls = 'w-full px-3 py-2.5 rounded-xl border border-border bg-card text-[13px] focus:outline-none focus:border-brand';
 
 function Section({ title, subtitle, icon: Icon, children }) {
   return (
-    <div className="bg-white rounded-2xl border border-hair p-5 shadow-card mb-4">
+    <div className="bg-card rounded-2xl border border-border p-5 shadow-card mb-4">
       <div className="flex items-center gap-2.5 mb-4">
         <div className="grid place-items-center w-9 h-9 rounded-xl bg-brand-light text-brand"><Icon className="w-4.5 h-4.5" /></div>
         <div>
-          <h2 className="font-display font-700 text-[16px] text-ink leading-none">{title}</h2>
-          {subtitle && <p className="text-[11px] text-mutedink mt-1">{subtitle}</p>}
+          <h2 className="font-display font-700 text-[16px] text-foreground leading-none">{title}</h2>
+          {subtitle && <p className="text-[11px] text-muted-foreground mt-1">{subtitle}</p>}
         </div>
       </div>
       <div className="space-y-3">{children}</div>
@@ -206,7 +204,7 @@ function Section({ title, subtitle, icon: Icon, children }) {
 function Field({ label, children }) {
   return (
     <div>
-      <label className="block text-[11px] font-600 text-mutedink mb-1.5">{label}</label>
+      <label className="block text-[11px] font-600 text-muted-foreground mb-1.5">{label}</label>
       {children}
     </div>
   );
@@ -215,14 +213,14 @@ function Field({ label, children }) {
 function Toggle({ icon: Icon, title, desc, checked, onChange }) {
   return (
     <div className="flex items-start gap-3 py-2">
-      <div className="grid place-items-center w-9 h-9 rounded-xl bg-muted text-ink shrink-0"><Icon className="w-4 h-4" /></div>
+      <div className="grid place-items-center w-9 h-9 rounded-xl bg-muted text-foreground shrink-0"><Icon className="w-4 h-4" /></div>
       <div className="flex-1 min-w-0">
-        <p className="text-[13px] font-600 text-ink">{title}</p>
-        <p className="text-[11px] text-mutedink mt-0.5 leading-relaxed">{desc}</p>
+        <p className="text-[13px] font-600 text-foreground">{title}</p>
+        <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{desc}</p>
       </div>
       <button onClick={() => onChange(!checked)}
-        className={cn('relative w-11 h-6 rounded-full transition-colors shrink-0 mt-0.5', checked ? 'bg-brand' : 'bg-hair')}>
-        <span className={cn('absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all', checked ? 'left-[22px]' : 'left-0.5')} />
+        className={cn('relative w-11 h-6 rounded-full transition-colors shrink-0 mt-0.5', checked ? 'bg-brand' : 'bg-muted')}>
+        <span className={cn('absolute top-0.5 w-5 h-5 rounded-full bg-card shadow transition-all', checked ? 'left-[22px]' : 'left-0.5')} />
       </button>
     </div>
   );

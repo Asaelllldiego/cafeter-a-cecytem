@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Home as HomeIcon, ClipboardList, Tag, User, ShieldCheck } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
@@ -9,6 +9,7 @@ const ACTIVE_STATUSES = ['pendiente', 'en_preparacion', 'listo'];
 
 export default function BottomNav() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const isAdmin = user?.role === 'admin';
   const [activeCount, setActiveCount] = useState(0);
@@ -50,8 +51,11 @@ export default function BottomNav() {
           const active = location.pathname === item.path;
           const Icon = item.icon;
           return (
-            <Link key={item.path} to={item.path}
-              className={cn('relative flex flex-col items-center justify-center gap-1 py-2.5 transition-colors',
+            <button key={item.path} type="button" onClick={() => {
+              if (active) { navigate(item.path, { state: { _t: Date.now() } }); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+              else navigate(item.path);
+            }}
+              className={cn('relative flex flex-col items-center justify-center gap-1 py-2.5 transition-colors w-full',
                 active ? 'text-brand' : 'text-mutedink')}>
               <span className="relative">
                 <Icon className="w-[22px] h-[22px]" />
@@ -60,7 +64,7 @@ export default function BottomNav() {
                 )}
               </span>
               <span className="text-[10px] font-600">{item.label}</span>
-            </Link>
+            </button>
           );
         })}
       </div>

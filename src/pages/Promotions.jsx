@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { base44 } from '@/api/base44Client';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, Tag } from 'lucide-react';
+import PullToRefresh from '@/components/PullToRefresh';
 
 export default function Promotions() {
-  const [promos, setPromos] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    base44.entities.Promotion.filter({}, { limit: 20 })
-      .then(res => setPromos(res.items || []))
-      .catch(() => setPromos([]))
-      .finally(() => setLoading(false));
-  }, []);
+  const queryClient = useQueryClient();
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ['promotions'],
+    queryFn: () => base44.entities.Promotion.filter({}, { limit: 20 }).then(r => r.items || []),
+  });
+  const promos = data || [];
 
   return (
+    <PullToRefresh onRefresh={async () => { await queryClient.invalidateQueries({ queryKey: ['promotions'] }); }}>
     <div className="px-4 lg:px-8 py-5 lg:py-7 max-w-4xl">
       <h1 className="font-display font-700 text-[28px] lg:text-[32px] text-ink mb-1">Promociones</h1>
       <p className="text-[14px] text-mutedink mb-6">Combos y descuentos exclusivos para estudiantes</p>
@@ -48,5 +48,6 @@ export default function Promotions() {
         </div>
       )}
     </div>
+    </PullToRefresh>
   );
 }

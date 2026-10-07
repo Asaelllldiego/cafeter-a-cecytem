@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import PromoCarousel from '@/components/PromoCarousel';
@@ -10,6 +10,8 @@ import FaqSection from '@/components/FaqSection';
 import SiteFooter from '@/components/SiteFooter';
 import { Loader2, Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import PullToRefresh from '@/components/PullToRefresh';
 
 const CAT_ORDER = ['Comida (diario)', 'Bebidas', 'Especiales', 'Higiene', 'Snacks', 'Postres'];
 const CAT_META = {
@@ -22,18 +24,15 @@ const CAT_META = {
 };
 
 export default function Home() {
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [day, setDay] = useState(todayWeekday());
   const [q, setQ] = useState('');
   const [activeCat, setActiveCat] = useState('todas');
-
-  useEffect(() => {
-    base44.entities.MenuItem.filter({}, { sort: '-popular', limit: 200 })
-      .then(res => setItems(res.items || []))
-      .catch(() => setItems([]))
-      .finally(() => setLoading(false));
-  }, []);
+  const queryClient = useQueryClient();
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ['menuItems'],
+    queryFn: () => base44.entities.MenuItem.filter({}, { sort: '-popular', limit: 200 }).then(r => r.items || []),
+  });
+  const items = data || [];
 
   const available = items.filter(i => i.available !== false);
   const searching = q.trim().length > 0;
@@ -52,11 +51,12 @@ export default function Home() {
     .filter(s => s.list.length > 0);
 
   return (
+    <PullToRefresh onRefresh={async () => { await queryClient.invalidateQueries({ queryKey: ['menuItems'] }); }}>
     <div className="lg:flex">
       <div className="flex-1 min-w-0 px-4 lg:px-8 py-5 lg:py-7">
         <div className="hidden lg:block mb-4">
-          <h1 className="font-display font-700 text-[32px] text-ink leading-tight">¡Buen provecho! 🌮</h1>
-          <p className="text-[14px] text-mutedink mt-1">Pide tu comida favorita y recógela en el recreo</p>
+          <h1 className="font-display font-700 text-[32px] text-foreground leading-tight">¡Buen provecho! 🌮</h1>
+          <p className="text-[14px] text-muted-foreground mt-1">Pide tu comida favorita y recógela en el recreo</p>
         </div>
 
         <div className="mb-4">
@@ -69,12 +69,12 @@ export default function Home() {
 
         <div className="sticky top-0 lg:top-0 z-10 -mx-4 lg:-mx-8 px-4 lg:px-8 pb-3 pt-2 bg-background/95 backdrop-blur mb-5">
           <div className="relative mb-2.5">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mutedink" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input value={q} onChange={e => setQ(e.target.value)} placeholder="Buscar producto (café, gel, gerber...)"
-              className="w-full pl-9 pr-9 py-2.5 rounded-pill border border-hair bg-white text-[13px] focus:outline-none focus:border-brand" />
+              className="w-full pl-9 pr-9 py-2.5 rounded-pill border border-border bg-card text-[13px] focus:outline-none focus:border-brand" />
             {searching && (
               <button onClick={() => setQ('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 grid place-items-center w-6 h-6 rounded-full hover:bg-muted">
-                <X className="w-3.5 h-3.5 text-mutedink" />
+                <X className="w-3.5 h-3.5 text-muted-foreground" />
               </button>
             )}
           </div>
@@ -96,7 +96,7 @@ export default function Home() {
           </div>
         ) : searching ? (
           <div className="space-y-3">
-            <p className="text-[13px] text-mutedink">{searchResults.length} resultado(s) para “{q}”</p>
+            <p className="text-[13px] text-muted-foreground">{searchResults.length} resultado(s) para “{q}”</p>
             <Grid items={searchResults} empty="Sin coincidencias. Prueba con otro nombre." />
           </div>
         ) : (
@@ -119,10 +119,11 @@ export default function Home() {
         <SiteFooter />
       </div>
 
-      <div className="hidden lg:block w-[340px] shrink-0 border-l border-hair bg-white sticky top-0 h-screen overflow-hidden">
+      <div className="hidden lg:block w-[340px] shrink-0 border-l border-border bg-card sticky top-0 h-screen overflow-hidden">
         <CheckoutPanel />
       </div>
     </div>
+    </PullToRefresh>
   );
 }
 
@@ -130,7 +131,7 @@ function FilterPill({ active, onClick, children }) {
   return (
     <button onClick={onClick}
       className={cn('shrink-0 px-3.5 py-1.5 rounded-pill text-[12px] font-600 transition-colors',
-        active ? 'bg-brand text-white' : 'bg-white border border-hair text-ink hover:border-brand/40')}>
+        active ? 'bg-brand text-white' : 'bg-card border border-border text-foreground hover:border-brand/40')}>
       {children}
     </button>
   );
@@ -141,8 +142,8 @@ function Section({ title, subtitle, children }) {
     <section>
       <div className="flex items-baseline justify-between mb-3">
         <div>
-          <h2 className="font-display font-700 text-[19px] text-ink leading-none">{title}</h2>
-          {subtitle && <p className="text-[12px] text-mutedink mt-1">{subtitle}</p>}
+          <h2 className="font-display font-700 text-[19px] text-foreground leading-none">{title}</h2>
+          {subtitle && <p className="text-[12px] text-muted-foreground mt-1">{subtitle}</p>}
         </div>
       </div>
       <div className="mb-3">{children}</div>
@@ -152,7 +153,7 @@ function Section({ title, subtitle, children }) {
 
 function Grid({ items, empty }) {
   if (!items || items.length === 0) {
-    return <p className="text-[13px] text-mutedink py-6 text-center bg-white rounded-2xl border border-dashed border-hair">{empty || 'Sin productos'}</p>;
+    return <p className="text-[13px] text-muted-foreground py-6 text-center bg-card rounded-2xl border border-dashed border-border">{empty || 'Sin productos'}</p>;
   }
   return (
     <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">

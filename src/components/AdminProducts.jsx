@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Loader2, RefreshCw, Plus, Pencil, Search, Trash2, X, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import MobileSelect from '@/components/MobileSelect';
 
 const CATEGORIES = ['Comida (diario)', 'Bebidas', 'Especiales', 'Higiene', 'Snacks', 'Postres'];
 
@@ -192,22 +192,13 @@ function ProductForm({ initial, onCancel, onSave }) {
           </Field>
         </div>
         <Field label="Categoría">
-          <Select value={form.category} onValueChange={v => set('category', v)}>
-            <SelectTrigger className={inputCls}><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-            </SelectContent>
-          </Select>
+          <MobileSelect value={form.category} onValueChange={v => set('category', v)} className={inputCls} placeholder="Categoría"
+            options={CATEGORIES.map(c => ({ value: c, label: c }))} />
         </Field>
         {form.category === 'Comida (diario)' && (
           <Field label="Día de la semana">
-            <Select value={form.day_of_week || 'none'} onValueChange={v => set('day_of_week', v === 'none' ? '' : v)}>
-              <SelectTrigger className={inputCls}><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">—</SelectItem>
-                {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'].map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <MobileSelect value={form.day_of_week || 'none'} onValueChange={v => set('day_of_week', v === 'none' ? '' : v)} className={inputCls} placeholder="Día de la semana"
+              options={[{ value: 'none', label: '—' }, ...['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'].map(d => ({ value: d, label: d }))]} />
           </Field>
         )}
         <Field label="Imagen (URL)">
