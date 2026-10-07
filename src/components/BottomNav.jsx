@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { cn } from '@/lib/utils';
 
 const ACTIVE_STATUSES = ['pendiente', 'en_preparacion', 'listo'];
+const MENU_SUBROUTE_KEY = 'lastMenuSubroute';
 
 export default function BottomNav() {
   const location = useLocation();
@@ -30,6 +31,13 @@ export default function BottomNav() {
     return unsub;
   }, []);
 
+  // Record the most recently visited menu-tab sub-route so we can return to it.
+  useEffect(() => {
+    if (location.pathname.startsWith('/producto/')) {
+      try { sessionStorage.setItem(MENU_SUBROUTE_KEY, location.pathname); } catch (e) {}
+    }
+  }, [location.pathname]);
+
   const userItems = [
     { label: 'Menú', path: '/', icon: HomeIcon },
     { label: 'Mis Pedidos', path: '/pedidos', icon: ClipboardList, badge: activeCount },
@@ -52,8 +60,18 @@ export default function BottomNav() {
           const Icon = item.icon;
           return (
             <button key={item.path} type="button" onClick={() => {
-              if (active) { navigate(item.path, { state: { _t: Date.now() } }); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-              else navigate(item.path);
+              if (item.path === '/') {
+                if (active) { navigate('/', { state: { _t: Date.now() } }); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+                else if (location.pathname.startsWith('/producto/')) { navigate('/'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+                else {
+                  let last = '';
+                  try { last = sessionStorage.getItem(MENU_SUBROUTE_KEY) || ''; } catch (e) {}
+                  navigate(last || '/'); window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              } else {
+                if (active) { navigate(item.path, { state: { _t: Date.now() } }); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+                else navigate(item.path);
+              }
             }}
               className={cn('relative flex flex-col items-center justify-center gap-1 py-2.5 transition-colors w-full',
                 active ? 'text-brand' : 'text-mutedink')}>
