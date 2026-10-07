@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Loader2, RefreshCw, Plus, Pencil, Search, Trash2, X, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
 const CATEGORIES = ['Comida (diario)', 'Bebidas', 'Especiales', 'Higiene', 'Snacks', 'Postres'];
 
@@ -191,16 +192,22 @@ function ProductForm({ initial, onCancel, onSave }) {
           </Field>
         </div>
         <Field label="Categoría">
-          <select value={form.category} onChange={e => set('category', e.target.value)} className={inputCls}>
-            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
+          <Select value={form.category} onValueChange={v => set('category', v)}>
+            <SelectTrigger className={inputCls}><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
         </Field>
         {form.category === 'Comida (diario)' && (
           <Field label="Día de la semana">
-            <select value={form.day_of_week || ''} onChange={e => set('day_of_week', e.target.value)} className={inputCls}>
-              <option value="">—</option>
-              {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'].map(d => <option key={d} value={d}>{d}</option>)}
-            </select>
+            <Select value={form.day_of_week || 'none'} onValueChange={v => set('day_of_week', v === 'none' ? '' : v)}>
+              <SelectTrigger className={inputCls}><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">—</SelectItem>
+                {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'].map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </Field>
         )}
         <Field label="Imagen (URL)">

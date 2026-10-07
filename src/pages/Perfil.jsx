@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Loader2, User, Mail, GraduationCap, Phone, Bell, Tag, Save, Check, ShieldCheck } from 'lucide-react';
+import { Loader2, User, Mail, GraduationCap, Phone, Bell, Tag, Save, Check, ShieldCheck, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 
 export default function Perfil() {
   const { user, checkUserAuth } = useAuth();
@@ -104,10 +106,13 @@ export default function Perfil() {
               className={inputCls} />
           </Field>
           <Field label="Turno">
-            <select value={form.shift} onChange={e => update('shift', e.target.value)} className={inputCls}>
-              <option>Matutino</option>
-              <option>Vespertino</option>
-            </select>
+            <Select value={form.shift} onValueChange={v => update('shift', v)}>
+              <SelectTrigger className={inputCls}><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Matutino">Matutino</SelectItem>
+                <SelectItem value="Vespertino">Vespertino</SelectItem>
+              </SelectContent>
+            </Select>
           </Field>
           <Field label="Matrícula">
             <input value={form.student_id} onChange={e => update('student_id', e.target.value)} placeholder="Ej. 2026-001"
@@ -152,6 +157,31 @@ export default function Perfil() {
           : saved ? <><Check className="w-5 h-5" /> Cambios guardados</>
           : <><Save className="w-5 h-5" /> Guardar cambios</>}
       </button>
+
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <button type="button" className="w-full flex items-center justify-center gap-2 py-3.5 rounded-pill text-[15px] font-700 mt-3 bg-red-50 text-destructive border border-red-200 hover:bg-red-100">
+            <Trash2 className="w-5 h-5" /> Eliminar cuenta
+          </button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar tu cuenta?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción es permanente. Se eliminarán tus datos de perfil, tu historial de pedidos y tus preferencias, y no podrás recuperar tu cuenta ni tus pedidos anteriores. Si solo quieres salir, cierra sesión en su lugar.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={async () => { try { await base44.auth.logout('/login'); } catch (e) { window.location.href = '/login'; } }}
+            >
+              Sí, eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

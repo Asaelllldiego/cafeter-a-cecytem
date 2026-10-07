@@ -31,12 +31,40 @@
   }
 }
 
+/* Dark mode: se activa automáticamente con la preferencia del sistema */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: 222 16% 10%;
+    --foreground: 40 25% 96%;
+    --card: 222 16% 13%;
+    --card-foreground: 40 25% 96%;
+    --popover: 222 16% 13%;
+    --popover-foreground: 40 25% 96%;
+    --muted: 222 12% 18%;
+    --muted-foreground: 220 10% 65%;
+    --border: 222 12% 22%;
+    --input: 222 12% 22%;
+    --ring: 155 60% 42%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 98%;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground font-body antialiased;
+    overscroll-behavior-y: none;
+  }
+  main {
+    overscroll-behavior-y: none;
+  }
+  /* Evitar selección de texto en controles de interfaz (WebView nativo) */
+  header, aside, nav, button, [role="tab"], [role="tablist"] {
+    -webkit-user-select: none;
+    user-select: none;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-display;

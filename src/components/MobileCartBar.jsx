@@ -22,7 +22,7 @@ export default function MobileCartBar() {
         <span className="font-display font-700 text-[16px]">${total.toFixed(2)}</span>
       </button>
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="bottom" className="p-0 max-h-[85vh] overflow-hidden">
+        <SheetContent side="bottom" className="p-0 max-h-[85vh] overflow-hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
           <CheckoutPanel onDone={() => setOpen(false)} mobile />
         </SheetContent>
       </Sheet>
