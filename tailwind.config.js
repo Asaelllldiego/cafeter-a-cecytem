@@ -34,9 +34,10 @@ module.exports = {
           dark: '#E5A600',
           light: '#FFF5D6'
         },
-        ink: '#1A1C1E',
-        mutedink: '#6F7972',
-        hair: '#E0E4DE'
+        ink: 'hsl(var(--ink))',
+        mutedink: 'hsl(var(--mutedink))',
+        hair: 'hsl(var(--hair))',
+        onaccent: 'hsl(var(--on-accent))'
       },
       fontFamily: {
         heading: ['var(--font-heading)'],

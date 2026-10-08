@@ -33,7 +33,7 @@ export default function MenuCard({ item }) {
         )}
         <div className="absolute top-2.5 left-2.5 flex flex-col gap-1.5">
           {item.popular && (
-            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-pill bg-mustard text-ink text-[10px] font-700">
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-pill bg-mustard text-onaccent text-[10px] font-700">
               <Flame className="w-3 h-3" /> Popular
             </span>
           )}
@@ -42,7 +42,7 @@ export default function MenuCard({ item }) {
           )}
         </div>
         {outOfStock && (
-          <div className="absolute inset-0 bg-ink/50 grid place-items-center">
+          <div className="absolute inset-0 bg-black/50 grid place-items-center">
             <span className="px-3 py-1.5 rounded-pill bg-card text-foreground text-[12px] font-700">Agotado</span>
           </div>
         )}
@@ -68,7 +68,7 @@ export default function MenuCard({ item }) {
           </div>
           <button onClick={handleAdd} disabled={outOfStock}
             className={cn('grid place-items-center w-9 h-9 rounded-pill transition-all',
-              outOfStock ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-mustard text-ink hover:bg-mustard-dark hover:text-white active:scale-90',
+              outOfStock ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-mustard text-onaccent hover:bg-mustard-dark hover:text-white active:scale-90',
               pulsed && 'animate-pulse-add')}>
             <Plus className="w-5 h-5" strokeWidth={2.5} />
           </button>

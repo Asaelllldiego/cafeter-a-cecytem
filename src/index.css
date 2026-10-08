@@ -23,6 +23,10 @@
     --border: 96 14% 87%;
     --input: 96 14% 87%;
     --ring: 155 100% 21%;
+    --ink: 213 6% 11%;
+    --hair: 96 14% 87%;
+    --mutedink: 150 6% 45%;
+    --on-accent: 213 6% 11%;
     --radius: 1rem;
     --font-heading: "Outfit", ui-sans-serif, system-ui, sans-serif;
     --font-body: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
@@ -45,6 +49,10 @@
     --border: 222 12% 22%;
     --input: 222 12% 22%;
     --ring: 155 60% 42%;
+    --ink: 40 25% 96%;
+    --hair: 222 12% 22%;
+    --mutedink: 220 10% 65%;
+    --on-accent: 213 6% 11%;
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
   }

@@ -11,10 +11,10 @@ export default function MobileHeader() {
   const ROOT_TABS = ['/', '/pedidos', '/promociones', '/perfil', '/admin'];
   const isSubroute = !ROOT_TABS.includes(location.pathname);
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-hair select-none" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+    <header className="sticky top-0 z-30 bg-card border-b border-hair select-none" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       <div className="flex items-center justify-between px-4 h-14">
         {isSubroute ? (
-          <button onClick={() => navigate(-1)} className="grid place-items-center w-10 h-10 -ml-2 rounded-full hover:bg-muted text-ink">
+          <button onClick={() => navigate(-1)} className="grid place-items-center w-10 h-10 -ml-2 rounded-full hover:bg-muted text-foreground">
             <ArrowLeft className="w-5 h-5" />
           </button>
         ) : (
@@ -23,7 +23,7 @@ export default function MobileHeader() {
               <UtensilsCrossed className="w-4 h-4" />
             </div>
             <div>
-              <p className="font-display font-700 text-[15px] leading-none text-ink">CECYTEM</p>
+              <p className="font-display font-700 text-[15px] leading-none text-foreground">CECYTEM</p>
               <p className="text-[10px] text-mutedink">Cafetería</p>
             </div>
           </Link>
@@ -34,13 +34,13 @@ export default function MobileHeader() {
               <ShieldCheck className="w-5 h-5" />
             </Link>
           )}
-          <Link to="/faq" className="grid place-items-center w-10 h-10 rounded-full hover:bg-muted text-ink">
+          <Link to="/faq" className="grid place-items-center w-10 h-10 rounded-full hover:bg-muted text-foreground">
             <HelpCircle className="w-5 h-5" />
           </Link>
-          <Link to="/perfil" className="grid place-items-center w-10 h-10 rounded-full hover:bg-muted text-ink">
+          <Link to="/perfil" className="grid place-items-center w-10 h-10 rounded-full hover:bg-muted text-foreground">
             <User className="w-5 h-5" />
           </Link>
-          <button className="grid place-items-center w-10 h-10 rounded-full hover:bg-muted text-ink">
+          <button className="grid place-items-center w-10 h-10 rounded-full hover:bg-muted text-foreground">
             <Search className="w-5 h-5" />
           </button>
         </div>

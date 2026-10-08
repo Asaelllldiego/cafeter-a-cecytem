@@ -15,7 +15,7 @@ export default function Promotions() {
   return (
     <PullToRefresh onRefresh={async () => { await queryClient.invalidateQueries({ queryKey: ['promotions'] }); }}>
     <div className="px-4 lg:px-8 py-5 lg:py-7 max-w-4xl">
-      <h1 className="font-display font-700 text-[28px] lg:text-[32px] text-ink mb-1">Promociones</h1>
+      <h1 className="font-display font-700 text-[28px] lg:text-[32px] text-foreground mb-1">Promociones</h1>
       <p className="text-[14px] text-mutedink mb-6">Combos y descuentos exclusivos para estudiantes</p>
 
       {loading ? (
@@ -23,7 +23,7 @@ export default function Promotions() {
       ) : promos.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="text-5xl mb-3">🎉</div>
-          <h3 className="font-display font-600 text-[18px] text-ink">No hay promociones activas</h3>
+          <h3 className="font-display font-600 text-[18px] text-foreground">No hay promociones activas</h3>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">

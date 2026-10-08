@@ -9,8 +9,8 @@ export default function CategoryFilter({ active, onChange }) {
       <div className="flex gap-2 overflow-x-auto scrollbar-hide">
         {categories.map(cat => (
           <button key={cat} onClick={() => onChange(cat)}
-            className={cn('shrink-0 px-4 py-2 rounded-pill text-[13px] font-600 whitespace-nowrap transition-colors',
-              active === cat ? 'bg-brand text-white' : 'bg-white text-ink border border-hair hover:border-brand/40')}>
+            className={cn('shrink-0 inline-flex items-center px-4 py-2.5 min-h-[44px] rounded-pill text-[13px] font-600 whitespace-nowrap transition-colors',
+              active === cat ? 'bg-brand text-white' : 'bg-card text-foreground border border-border hover:border-brand/40')}>
             {cat}
           </button>
         ))}

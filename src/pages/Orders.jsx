@@ -31,7 +31,7 @@ export default function Orders() {
   return (
     <PullToRefresh onRefresh={async () => { await queryClient.invalidateQueries({ queryKey: ['myOrders'] }); }}>
     <div className="px-4 lg:px-8 py-5 lg:py-7 max-w-3xl">
-      <h1 className="font-display font-700 text-[28px] lg:text-[32px] text-ink mb-1">Mis Pedidos</h1>
+      <h1 className="font-display font-700 text-[28px] lg:text-[32px] text-foreground mb-1">Mis Pedidos</h1>
       <p className="text-[14px] text-mutedink mb-6">Rastrea tus pedidos activos y programados</p>
 
       {loading ? (
@@ -39,7 +39,7 @@ export default function Orders() {
       ) : orders.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="text-5xl mb-3">📋</div>
-          <h3 className="font-display font-600 text-[18px] text-ink">No tienes pedidos aún</h3>
+          <h3 className="font-display font-600 text-[18px] text-foreground">No tienes pedidos aún</h3>
           <p className="text-[13px] text-mutedink mt-1">Cuando confirmes un pedido aparecerá aquí</p>
         </div>
       ) : (
@@ -48,7 +48,7 @@ export default function Orders() {
             const st = statusConfig[o.status] || statusConfig.pendiente;
             const Icon = st.icon;
             return (
-              <div key={o.id} className="bg-white rounded-[16px] border border-hair p-4 shadow-card">
+              <div key={o.id} className="bg-card rounded-[16px] border border-hair p-4 shadow-card">
                 <div className="flex items-center justify-between mb-3">
                   <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-pill text-[11px] font-700', st.bg, st.color)}>
                     <Icon className="w-3.5 h-3.5" /> {st.label}
@@ -60,14 +60,14 @@ export default function Orders() {
 
                 <div className="flex items-center gap-2 mb-3">
                   <Clock className="w-4 h-4 text-mustard-dark" />
-                  <span className="text-[13px] font-600 text-ink">Recoger: {o.pickup_time}</span>
+                  <span className="text-[13px] font-600 text-foreground">Recoger: {o.pickup_time}</span>
                   {o.customer_name && <span className="text-[12px] text-mutedink">· {o.customer_name}</span>}
                 </div>
 
                 <div className="space-y-1.5 mb-3">
                   {o.items?.map((it, idx) => (
                     <div key={idx} className="flex justify-between text-[13px]">
-                      <span className="text-ink"><span className="font-600">{it.quantity}×</span> {it.name}</span>
+                      <span className="text-foreground"><span className="font-600">{it.quantity}×</span> {it.name}</span>
                       <span className="text-mutedink">${(it.price * it.quantity).toFixed(2)}</span>
                     </div>
                   ))}

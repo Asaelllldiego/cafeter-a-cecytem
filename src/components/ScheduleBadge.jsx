@@ -14,9 +14,9 @@ export function isWithinSchedule(date = new Date()) {
 export default function ScheduleBadge({ className, showStatus = true }) {
   const open = isWithinSchedule();
   return (
-    <div className={cn('inline-flex items-center gap-2 px-3 py-1.5 rounded-pill bg-white border border-hair', className)}>
+    <div className={cn('inline-flex items-center gap-2 px-3 py-1.5 rounded-pill bg-card border border-hair', className)}>
       <Clock className="w-3.5 h-3.5 text-brand" />
-      <span className="text-[12px] font-600 text-ink">Horario: {SCHEDULE_TEXT}</span>
+      <span className="text-[12px] font-600 text-foreground">Horario: {SCHEDULE_TEXT}</span>
       {showStatus && (
         <span className={cn('text-[10px] font-700 px-1.5 py-0.5 rounded-pill', open ? 'bg-brand-light text-brand' : 'bg-red-100 text-red-700')}>
           {open ? 'Abierto' : 'Cerrado'}

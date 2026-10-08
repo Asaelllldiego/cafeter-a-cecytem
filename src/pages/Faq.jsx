@@ -8,7 +8,7 @@ const WHATSAPP = 'https://wa.me/5210000000000?text=Hola%20cafeter%C3%ADa%20CECYT
 export default function Faq() {
   return (
     <div className="px-4 lg:px-8 py-5 lg:py-7 max-w-3xl mx-auto">
-      <h1 className="font-display font-700 text-[28px] lg:text-[32px] text-ink mb-1 flex items-center gap-2">
+      <h1 className="font-display font-700 text-[28px] lg:text-[32px] text-foreground mb-1 flex items-center gap-2">
         <HelpCircle className="w-7 h-7 text-brand" /> Preguntas frecuentes
       </h1>
       <p className="text-[14px] text-mutedink mb-6">Todo lo que necesitas saber antes de pedir en la cafetería</p>
@@ -20,7 +20,7 @@ export default function Faq() {
           <MessageCircle className="w-6 h-6" />
         </div>
         <div className="flex-1">
-          <p className="font-display font-700 text-[16px] text-ink">¿No encontraste tu respuesta?</p>
+          <p className="font-display font-700 text-[16px] text-onaccent">¿No encontraste tu respuesta?</p>
           <p className="text-[13px] text-mutedink mt-0.5">Escríbenos por WhatsApp y te ayudamos enseguida.</p>
         </div>
         <a href={WHATSAPP} target="_blank" rel="noreferrer"

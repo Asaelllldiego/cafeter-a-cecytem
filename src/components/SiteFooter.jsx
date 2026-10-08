@@ -7,7 +7,7 @@ const WHATSAPP_TEXT = encodeURIComponent('¡Hola! Quiero hacer un pedido en la C
 
 export default function SiteFooter() {
   return (
-    <footer className="mt-8 border-t border-hair bg-white">
+    <footer className="mt-8 border-t border-hair bg-card">
       <div className="max-w-5xl mx-auto px-4 lg:px-8 py-7">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div>
@@ -15,14 +15,14 @@ export default function SiteFooter() {
               <div className="grid place-items-center w-8 h-8 rounded-xl bg-brand text-white">
                 <UtensilsCrossed className="w-4 h-4" />
               </div>
-              <p className="font-display font-700 text-[15px] text-ink">CECYTEM</p>
+              <p className="font-display font-700 text-[15px] text-foreground">CECYTEM</p>
             </div>
             <p className="text-[12px] text-mutedink leading-relaxed">Cooperativa escolar. Comida, bebidas y artículos de higiene para la comunidad estudiantil.</p>
           </div>
 
           <div>
             <p className="text-[11px] font-600 uppercase tracking-wide text-mutedink mb-2">Información</p>
-            <ul className="space-y-1.5 text-[12px] text-ink">
+            <ul className="space-y-1.5 text-[12px] text-foreground">
               <li className="flex items-center gap-2"><Clock className="w-3.5 h-3.5 text-brand" /> {SCHEDULE_TEXT}</li>
               <li className="flex items-center gap-2"><CreditCard className="w-3.5 h-3.5 text-brand" /> Efectivo y tarjeta</li>
               <li className="flex items-center gap-2"><MapPin className="w-3.5 h-3.5 text-brand" /> Plantel CECYTEM</li>

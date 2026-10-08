@@ -80,12 +80,12 @@ export default function CheckoutPanel({ onDone, mobile }) {
             </div>
             <div className="flex items-center gap-1.5">
               <button onClick={() => updateQuantity(i.id, i.quantity - 1)}
-                className="grid place-items-center w-7 h-7 rounded-full border border-border hover:bg-muted">
+                className="grid place-items-center w-11 h-11 rounded-full border border-border hover:bg-muted">
                 {i.quantity === 1 ? <Trash2 className="w-3.5 h-3.5 text-destructive" /> : <Minus className="w-3.5 h-3.5" />}
               </button>
               <span className="w-5 text-center text-[13px] font-700">{i.quantity}</span>
               <button onClick={() => updateQuantity(i.id, i.quantity + 1)}
-                className="grid place-items-center w-7 h-7 rounded-full border border-border hover:bg-muted">
+                className="grid place-items-center w-11 h-11 rounded-full border border-border hover:bg-muted">
                 <Plus className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -105,7 +105,7 @@ export default function CheckoutPanel({ onDone, mobile }) {
           <div>
             <label className="text-[11px] font-600 uppercase tracking-wide text-muted-foreground mb-1.5 block">Tu nombre</label>
             <input value={customerName} onChange={e => setCustomerName(e.target.value)} placeholder="Ej. Ana López"
-              className="w-full px-3 py-2 rounded-xl border border-border bg-white text-[13px] focus:outline-none focus:border-brand" />
+              className="w-full px-3 py-2 rounded-xl border border-border bg-card text-[13px] focus:outline-none focus:border-brand" />
           </div>
 
           <div>
@@ -114,19 +114,19 @@ export default function CheckoutPanel({ onDone, mobile }) {
               {pickupOptions.map(opt => (
                 <button key={opt} onClick={() => setPickupTime(opt)}
                   className={cn('flex-1 px-2 py-2 rounded-xl text-[11px] font-600 transition-colors',
-                    pickupTime === opt ? 'bg-brand text-white' : 'bg-white border border-border text-foreground')}>
+                    pickupTime === opt ? 'bg-brand text-white' : 'bg-card border border-border text-foreground')}>
                   {opt === 'Personalizado' ? 'Otro' : opt}
                 </button>
               ))}
             </div>
             {pickupTime === 'Personalizado' && (
               <input type="time" value={customTime} onChange={e => setCustomTime(e.target.value)}
-                className="w-full mt-2 px-3 py-2 rounded-xl border border-border bg-white text-[13px] focus:outline-none focus:border-brand" />
+                className="w-full mt-2 px-3 py-2 rounded-xl border border-border bg-card text-[13px] focus:outline-none focus:border-brand" />
             )}
           </div>
 
           <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Notas (sin cebolla, extra salsa...)"
-            className="w-full px-3 py-2 rounded-xl border border-border bg-white text-[13px] resize-none focus:outline-none focus:border-brand" rows={2} />
+            className="w-full px-3 py-2 rounded-xl border border-border bg-card text-[13px] resize-none focus:outline-none focus:border-brand" rows={2} />
 
           <div className="space-y-1.5 pt-1">
             <div className="flex justify-between text-[13px] text-muted-foreground">

@@ -35,20 +35,20 @@ export default function OrderAlerts() {
   return (
     <div className="fixed z-40 top-4 right-4 lg:right-[260px]">
       {isNew && (
-        <div className="flex items-center gap-2 mb-2 bg-mustard text-ink rounded-pill pl-3 pr-2 py-1.5 shadow-float animate-pulse-add">
+        <div className="flex items-center gap-2 mb-2 bg-mustard text-onaccent rounded-pill pl-3 pr-2 py-1.5 shadow-float animate-pulse-add">
           <Bell className="w-4 h-4" />
           <span className="text-[12px] font-700">{newIds.size} pedido(s) nuevo(s)</span>
-          <button onClick={() => setNewIds(new Set())} className="grid place-items-center w-5 h-5 rounded-full hover:bg-ink/10">
+          <button onClick={() => setNewIds(new Set())} className="grid place-items-center w-5 h-5 rounded-full hover:bg-black/10">
             <X className="w-3 h-3" />
           </button>
         </div>
       )}
-      <a href="/admin" className="flex items-center gap-2 bg-white border border-hair rounded-pill px-3 py-1.5 shadow-card hover:border-brand/40 transition">
+      <a href="/admin" className="flex items-center gap-2 bg-card border border-hair rounded-pill px-3 py-1.5 shadow-card hover:border-brand/40 transition">
         <span className="relative grid place-items-center w-6 h-6">
           <Bell className="w-[18px] h-[18px] text-brand" />
           {pending > 0 && <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 grid place-items-center rounded-full bg-destructive text-white text-[10px] font-700">{pending}</span>}
         </span>
-        <span className="text-[12px] font-600 text-ink hidden sm:inline">Pedidos admin</span>
+        <span className="text-[12px] font-600 text-foreground hidden sm:inline">Pedidos admin</span>
       </a>
     </div>
   );

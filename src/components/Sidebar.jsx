@@ -17,13 +17,13 @@ export default function Sidebar() {
     ...(isAdmin ? [{ label: 'Admin pedidos', path: '/admin', icon: ShieldCheck }, { label: 'Reportes', path: '/admin/reportes', icon: BarChart3 }] : []),
   ];
   return (
-    <aside className="fixed left-0 top-0 z-30 h-screen w-[240px] border-r border-hair bg-white flex flex-col">
+    <aside className="fixed left-0 top-0 z-30 h-screen w-[240px] border-r border-hair bg-card flex flex-col">
       <div className="flex items-center gap-2.5 px-5 h-[72px] border-b border-hair">
         <div className="grid place-items-center w-10 h-10 rounded-2xl bg-brand text-white">
           <UtensilsCrossed className="w-5 h-5" />
         </div>
         <div>
-          <p className="font-display font-700 text-[17px] leading-none text-ink">CECYTEM</p>
+          <p className="font-display font-700 text-[17px] leading-none text-foreground">CECYTEM</p>
           <p className="text-[11px] text-mutedink mt-0.5">Cafetería · Cooperativa</p>
         </div>
       </div>
@@ -35,7 +35,7 @@ export default function Sidebar() {
           return (
             <Link key={item.path} to={item.path}
               className={cn('flex items-center gap-3 px-3 py-2.5 rounded-pill text-sm font-500 transition-colors',
-                active ? 'bg-brand text-white' : 'text-ink hover:bg-muted')}>
+                active ? 'bg-brand text-white' : 'text-foreground hover:bg-muted')}>
               <Icon className="w-[18px] h-[18px]" />
               {item.label}
             </Link>
@@ -46,7 +46,7 @@ export default function Sidebar() {
           <div className="px-3 py-2.5 rounded-2xl bg-mustard-light flex items-center gap-2.5">
             <Clock className="w-[18px] h-[18px] text-mustard-dark" />
             <div>
-              <p className="text-[13px] font-600 text-ink leading-none">Pedidos programados</p>
+              <p className="text-[13px] font-600 text-onaccent leading-none">Pedidos programados</p>
               <p className="text-[11px] text-mutedink mt-1">Receso 1 · 10:30 am</p>
             </div>
           </div>
@@ -59,7 +59,7 @@ export default function Sidebar() {
             <User className="w-[18px] h-[18px]" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-600 text-ink truncate">Estudiante</p>
+            <p className="text-[13px] font-600 text-foreground truncate">Estudiante</p>
             <p className="text-[11px] text-mutedink truncate">Inicia sesión</p>
           </div>
         </div>

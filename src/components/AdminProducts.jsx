@@ -69,10 +69,10 @@ export default function AdminProducts() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mutedink" />
             <input value={q} onChange={e => setQ(e.target.value)} placeholder="Buscar producto..."
-              className="w-full pl-9 pr-3 py-2 rounded-pill border border-hair bg-white text-[13px] focus:outline-none focus:border-brand" />
+              className="w-full pl-9 pr-3 py-2 rounded-pill border border-hair bg-card text-[13px] focus:outline-none focus:border-brand" />
           </div>
-          <button onClick={load} className="grid place-items-center w-10 h-10 rounded-full border border-hair bg-white hover:bg-muted shrink-0">
-            <RefreshCw className={cn('w-[18px] h-[18px] text-ink', loading && 'animate-spin')} />
+          <button onClick={load} className="grid place-items-center w-10 h-10 rounded-full border border-hair bg-card hover:bg-muted shrink-0">
+            <RefreshCw className={cn('w-[18px] h-[18px] text-foreground', loading && 'animate-spin')} />
           </button>
         </div>
         <button onClick={() => setEditing({ ...EMPTY })}
@@ -84,8 +84,8 @@ export default function AdminProducts() {
       <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-4">
         {['todas', ...CATEGORIES].map(c => (
           <button key={c} onClick={() => setCat(c)}
-            className={cn('shrink-0 px-3.5 py-1.5 rounded-pill text-[12px] font-600 transition-colors',
-              cat === c ? 'bg-brand text-white' : 'bg-white border border-hair text-ink hover:border-brand/40')}>
+            className={cn('shrink-0 px-4 py-2.5 min-h-[44px] rounded-pill text-[12px] font-600 transition-colors',
+              cat === c ? 'bg-brand text-white' : 'bg-card border border-hair text-foreground hover:border-brand/40')}>
             {c}
           </button>
         ))}
@@ -98,13 +98,13 @@ export default function AdminProducts() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {filtered.map(item => (
-            <div key={item.id} className="bg-white rounded-2xl border border-hair p-3.5 shadow-card">
+            <div key={item.id} className="bg-card rounded-2xl border border-hair p-3.5 shadow-card">
               <div className="flex items-start gap-3">
                 <div className="grid place-items-center w-12 h-12 rounded-xl bg-muted text-2xl shrink-0">
                   {item.image_url ? <img src={item.image_url} alt={item.name} className="w-full h-full object-cover rounded-xl" /> : (item.emoji || '🍽️')}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-display font-600 text-[14px] text-ink truncate">{item.name}</p>
+                  <p className="font-display font-600 text-[14px] text-foreground truncate">{item.name}</p>
                   <p className="text-[11px] text-mutedink">{item.category}</p>
                   <p className="font-display font-700 text-[15px] text-brand mt-0.5">${(item.price || 0).toFixed(2)}</p>
                 </div>
@@ -128,7 +128,7 @@ export default function AdminProducts() {
                   {item.available ? 'Disponible' : 'Agotado'}
                 </button>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setEditing(item)} className="grid place-items-center w-8 h-8 rounded-full hover:bg-muted text-ink">
+                  <button onClick={() => setEditing(item)} className="grid place-items-center w-8 h-8 rounded-full hover:bg-muted text-foreground">
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
                   <button onClick={() => remove(item)} className="grid place-items-center w-8 h-8 rounded-full hover:bg-red-50 text-destructive">
@@ -173,7 +173,7 @@ function ProductForm({ initial, onCancel, onSave }) {
   return (
     <form onSubmit={submit} className="flex flex-col h-full">
       <div className="flex items-center justify-between px-5 py-4 border-b border-hair">
-        <h3 className="font-display font-700 text-[17px] text-ink">{form.id ? 'Editar producto' : 'Nuevo producto'}</h3>
+        <h3 className="font-display font-700 text-[17px] text-foreground">{form.id ? 'Editar producto' : 'Nuevo producto'}</h3>
         <button type="button" onClick={onCancel} className="grid place-items-center w-8 h-8 rounded-full hover:bg-muted"><X className="w-4 h-4" /></button>
       </div>
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3.5">
@@ -211,18 +211,18 @@ function ProductForm({ initial, onCancel, onSave }) {
           <input value={form.prep_time || ''} onChange={e => set('prep_time', e.target.value)} className={inputCls} />
         </Field>
         <div className="flex gap-3">
-          <label className="flex items-center gap-2 text-[13px] text-ink">
+          <label className="flex items-center gap-2 text-[13px] text-foreground">
             <input type="checkbox" checked={!!form.available} onChange={e => set('available', e.target.checked)} className="w-4 h-4 accent-brand" />
             Disponible
           </label>
-          <label className="flex items-center gap-2 text-[13px] text-ink">
+          <label className="flex items-center gap-2 text-[13px] text-foreground">
             <input type="checkbox" checked={!!form.popular} onChange={e => set('popular', e.target.checked)} className="w-4 h-4 accent-brand" />
             Popular
           </label>
         </div>
       </div>
       <div className="px-5 py-4 border-t border-hair flex gap-2">
-        <button type="button" onClick={onCancel} className="flex-1 py-3 rounded-pill border border-hair text-[13px] font-600 text-ink">Cancelar</button>
+        <button type="button" onClick={onCancel} className="flex-1 py-3 rounded-pill border border-hair text-[13px] font-600 text-foreground">Cancelar</button>
         <button type="submit" disabled={saving}
           className="flex-1 py-3 rounded-pill bg-brand text-white text-[13px] font-700 hover:bg-brand-dark disabled:opacity-60">
           {saving ? 'Guardando...' : 'Guardar'}
@@ -232,7 +232,7 @@ function ProductForm({ initial, onCancel, onSave }) {
   );
 }
 
-const inputCls = 'w-full px-3 py-2 rounded-xl border border-hair bg-white text-[13px] focus:outline-none focus:border-brand';
+const inputCls = 'w-full px-3 py-2 rounded-xl border border-hair bg-card text-[13px] focus:outline-none focus:border-brand';
 
 function Field({ label, children }) {
   return (

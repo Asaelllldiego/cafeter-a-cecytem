@@ -84,7 +84,7 @@ export default function Reportes() {
       <div className="grid place-items-center py-24 px-4">
         <div className="text-center">
           <div className="grid place-items-center w-14 h-14 rounded-full bg-muted mx-auto mb-3"><Lock className="w-6 h-6 text-mutedink" /></div>
-          <h2 className="font-display font-700 text-[20px] text-ink">Acceso restringido</h2>
+          <h2 className="font-display font-700 text-[20px] text-foreground">Acceso restringido</h2>
           <p className="text-[13px] text-mutedink mt-1.5">Solo administradores pueden ver los reportes.</p>
         </div>
       </div>
@@ -97,7 +97,7 @@ export default function Reportes() {
 
   return (
     <div className="px-4 lg:px-8 py-5 lg:py-7">
-      <h1 className="font-display font-700 text-[26px] text-ink leading-tight flex items-center gap-2">
+      <h1 className="font-display font-700 text-[26px] text-foreground leading-tight flex items-center gap-2">
         <BarChart3 className="w-7 h-7 text-brand" /> Reportes de ventas
       </h1>
       <p className="text-[13px] text-mutedink mt-1 mb-4">Resumen de ventas, productos más vendidos y ganancias.</p>
@@ -110,7 +110,7 @@ export default function Reportes() {
           { key: 'mes', label: 'Mensual' },
         ].map(p => (
           <button key={p.key} onClick={() => setPeriod(p.key)}
-            className={`px-3.5 py-1.5 rounded-pill text-[12px] font-600 transition-colors ${period === p.key ? 'bg-brand text-white' : 'bg-white border border-hair text-ink hover:border-brand/40'}`}>
+            className={`px-4 py-2.5 min-h-[44px] rounded-pill text-[12px] font-600 transition-colors ${period === p.key ? 'bg-brand text-white' : 'bg-card border border-hair text-foreground hover:border-brand/40'}`}>
             {p.label}
           </button>
         ))}
@@ -191,7 +191,7 @@ export default function Reportes() {
             {topProducts.map((p, i) => (
               <div key={p.name} className="flex items-center gap-3 py-2 border-b border-hair last:border-0">
                 <span className="grid place-items-center w-7 h-7 rounded-full bg-brand-light text-brand text-[12px] font-700">{i + 1}</span>
-                <span className="flex-1 text-[13px] font-600 text-ink truncate">{p.name}</span>
+                <span className="flex-1 text-[13px] font-600 text-foreground truncate">{p.name}</span>
                 <span className="text-[13px] font-700 text-brand">{p.cantidad} u.</span>
               </div>
             ))}
@@ -204,9 +204,9 @@ export default function Reportes() {
 
 function Stat({ label, value, icon: Icon, cls }) {
   return (
-    <div className="bg-white rounded-2xl border border-hair p-3.5 shadow-card">
+    <div className="bg-card rounded-2xl border border-hair p-3.5 shadow-card">
       <div className={`grid place-items-center w-8 h-8 rounded-xl mb-2 ${cls}`}><Icon className="w-4 h-4" /></div>
-      <p className="font-display font-700 text-[20px] text-ink leading-none truncate">{value}</p>
+      <p className="font-display font-700 text-[20px] text-foreground leading-none truncate">{value}</p>
       <p className="text-[11px] text-mutedink mt-1">{label}</p>
     </div>
   );
@@ -214,11 +214,11 @@ function Stat({ label, value, icon: Icon, cls }) {
 
 function Card({ title, subtitle, icon: Icon, children }) {
   return (
-    <div className="bg-white rounded-2xl border border-hair p-4 lg:p-5 shadow-card">
+    <div className="bg-card rounded-2xl border border-hair p-4 lg:p-5 shadow-card">
       <div className="flex items-center gap-2.5 mb-4">
         <div className="grid place-items-center w-8 h-8 rounded-xl bg-brand-light text-brand"><Icon className="w-4 h-4" /></div>
         <div>
-          <h2 className="font-display font-700 text-[15px] text-ink leading-none">{title}</h2>
+          <h2 className="font-display font-700 text-[15px] text-foreground leading-none">{title}</h2>
           {subtitle && <p className="text-[11px] text-mutedink mt-1">{subtitle}</p>}
         </div>
       </div>

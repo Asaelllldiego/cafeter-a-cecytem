@@ -16,8 +16,8 @@ export default function DaySelector({ value, onChange }) {
         const isToday = day === todayWeekday();
         return (
           <button key={day} onClick={() => onChange(day)}
-            className={cn('shrink-0 px-3.5 py-2 rounded-pill text-[12px] font-600 whitespace-nowrap transition-colors relative',
-              active ? 'bg-brand text-white' : 'bg-white text-ink border border-hair hover:border-brand/40')}>
+            className={cn('shrink-0 inline-flex items-center px-4 py-2.5 min-h-[44px] rounded-pill text-[12px] font-600 whitespace-nowrap transition-colors relative',
+              active ? 'bg-brand text-white' : 'bg-card text-foreground border border-border hover:border-brand/40')}>
             {day}
             {isToday && <span className={cn('absolute -top-1 -right-1 w-2 h-2 rounded-full', active ? 'bg-mustard' : 'bg-brand')} />}
           </button>

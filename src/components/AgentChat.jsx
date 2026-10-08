@@ -68,7 +68,7 @@ export default function AgentChat() {
       </button>
 
       {open && (
-        <div className="fixed z-40 right-4 bottom-36 lg:bottom-24 w-[calc(100vw-2rem)] sm:w-[380px] max-w-[380px] bg-white rounded-3xl border border-hair shadow-float flex flex-col overflow-hidden animate-slide-up-sheet"
+        <div className="fixed z-40 right-4 bottom-36 lg:bottom-24 w-[calc(100vw-2rem)] sm:w-[380px] max-w-[380px] bg-card rounded-3xl border border-hair shadow-float flex flex-col overflow-hidden animate-slide-up-sheet"
           style={{ height: 'min(70vh, 560px)' }}>
           <div className="flex items-center gap-3 px-4 py-3 bg-brand text-white">
             <Image src={AVATAR} alt="Jagger" fittingType="fill" className="w-10 h-10 rounded-full bg-white/20 shrink-0" />
@@ -86,7 +86,7 @@ export default function AgentChat() {
               return (
                 <div key={i} className={cn('flex', isUser ? 'justify-end' : 'justify-start')}>
                   <div className={cn('max-w-[80%] px-3.5 py-2 rounded-2xl text-[13px] leading-relaxed',
-                    isUser ? 'bg-brand text-white rounded-br-md' : 'bg-white border border-hair text-ink rounded-bl-md')}>
+                    isUser ? 'bg-brand text-white rounded-br-md' : 'bg-card border border-hair text-foreground rounded-bl-md')}>
                     {!isUser && <ReactMarkdown>{m.content}</ReactMarkdown>}
                     {isUser && <p>{m.content}</p>}
                     {m.tool_calls?.map((tc, idx) => (
@@ -101,17 +101,17 @@ export default function AgentChat() {
             })}
             {busy && (
               <div className="flex justify-start">
-                <div className="bg-white border border-hair rounded-2xl rounded-bl-md px-3.5 py-2 text-[13px] text-mutedink">Jagger está escribiendo...</div>
+                <div className="bg-card border border-hair rounded-2xl rounded-bl-md px-3.5 py-2 text-[13px] text-mutedink">Jagger está escribiendo...</div>
               </div>
             )}
           </div>
 
-          <div className="flex items-center gap-2 px-3 py-2.5 border-t border-hair bg-white">
+          <div className="flex items-center gap-2 px-3 py-2.5 border-t border-hair bg-card">
             <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()}
               placeholder="Pregúntame por el menú..."
               className="flex-1 px-3.5 py-2.5 rounded-full border border-hair bg-background text-[13px] focus:outline-none focus:border-brand" />
             <button onClick={send} disabled={busy || !input.trim()}
-              className="grid place-items-center w-10 h-10 rounded-full bg-mustard text-ink hover:bg-mustard-dark hover:text-white disabled:opacity-50 active:scale-90 transition">
+              className="grid place-items-center w-10 h-10 rounded-full bg-mustard text-onaccent hover:bg-mustard-dark hover:text-white disabled:opacity-50 active:scale-90 transition">
               <Send className="w-[18px] h-[18px]" />
             </button>
           </div>

@@ -34,17 +34,17 @@ export default function FaqSection() {
   return (
     <section className="max-w-3xl mx-auto">
       <div className="text-center mb-5">
-        <h2 className="font-display font-700 text-[19px] text-ink">Preguntas frecuentes</h2>
+        <h2 className="font-display font-700 text-[19px] text-foreground">Preguntas frecuentes</h2>
         <p className="text-[12px] text-mutedink mt-1">Todo lo que necesitas saber antes de pedir</p>
       </div>
       <div className="space-y-2.5">
         {FAQS.map((f, i) => {
           const isOpen = open === i;
           return (
-            <div key={i} className="bg-white rounded-2xl border border-hair overflow-hidden">
+            <div key={i} className="bg-card rounded-2xl border border-hair overflow-hidden">
               <button onClick={() => setOpen(isOpen ? -1 : i)}
                 className="w-full flex items-center justify-between gap-3 px-4 py-3.5 text-left">
-                <span className="font-display font-600 text-[14px] text-ink">{f.q}</span>
+                <span className="font-display font-600 text-[14px] text-foreground">{f.q}</span>
                 <ChevronDown className={cn('w-4 h-4 text-mutedink shrink-0 transition-transform', isOpen && 'rotate-180')} />
               </button>
               {isOpen && <p className="px-4 pb-4 text-[13px] text-mutedink leading-relaxed">{f.a}</p>}

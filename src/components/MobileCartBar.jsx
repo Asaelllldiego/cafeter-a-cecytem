@@ -15,7 +15,7 @@ export default function MobileCartBar() {
         <span className="flex items-center gap-2.5">
           <span className="relative">
             <ShoppingBag className="w-5 h-5" />
-            <span className="absolute -top-1.5 -right-1.5 grid place-items-center min-w-[18px] h-[18px] px-1 rounded-full bg-mustard text-ink text-[10px] font-700">{itemCount}</span>
+            <span className="absolute -top-1.5 -right-1.5 grid place-items-center min-w-[18px] h-[18px] px-1 rounded-full bg-mustard text-onaccent text-[10px] font-700">{itemCount}</span>
           </span>
           <span className="text-[13px] font-500 flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{pickupTime}</span>
         </span>
