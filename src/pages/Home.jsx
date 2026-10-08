@@ -67,7 +67,7 @@ export default function Home() {
           <PromoCarousel />
         </div>
 
-        <div className="sticky top-0 lg:top-0 z-10 -mx-4 lg:-mx-8 px-4 lg:px-8 pb-3 pt-2 bg-background/95 backdrop-blur mb-5">
+        <div className="sticky top-14 lg:top-0 z-10 -mx-4 lg:-mx-8 px-4 lg:px-8 pb-3 pt-2 bg-background/95 backdrop-blur mb-5">
           <div className="relative mb-2.5">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input value={q} onChange={e => setQ(e.target.value)} placeholder="Buscar producto (café, gel, gerber...)"

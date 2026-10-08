@@ -18,7 +18,10 @@ export default function Layout() {
       <div className="min-h-screen bg-background">
         {isMobile && <MobileHeader />}
         {!isMobile && <Sidebar />}
-        <main className={!isMobile ? 'lg:ml-[240px]' : 'pb-[68px]'}>
+        <main
+          className={!isMobile ? 'lg:ml-[240px]' : 'pb-[68px]'}
+          style={isMobile ? { paddingBottom: 'calc(68px + env(safe-area-inset-bottom))' } : undefined}
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname + (location.state?._t ? `#${location.state._t}` : '')}

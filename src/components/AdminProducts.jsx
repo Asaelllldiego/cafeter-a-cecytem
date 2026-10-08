@@ -128,10 +128,10 @@ export default function AdminProducts() {
                   {item.available ? 'Disponible' : 'Agotado'}
                 </button>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => setEditing(item)} className="grid place-items-center w-8 h-8 rounded-full hover:bg-muted text-foreground">
+                  <button onClick={() => setEditing(item)} className="grid place-items-center w-11 h-11 rounded-full hover:bg-muted text-foreground">
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
-                  <button onClick={() => remove(item)} className="grid place-items-center w-8 h-8 rounded-full hover:bg-red-50 text-destructive">
+                  <button onClick={() => remove(item)} className="grid place-items-center w-11 h-11 rounded-full hover:bg-red-50 text-destructive">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
