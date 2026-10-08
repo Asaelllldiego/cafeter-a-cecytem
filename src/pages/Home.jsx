@@ -130,7 +130,7 @@ export default function Home() {
 function FilterPill({ active, onClick, children }) {
   return (
     <button onClick={onClick}
-      className={cn('shrink-0 px-3.5 py-1.5 rounded-pill text-[12px] font-600 transition-colors',
+      className={cn('shrink-0 inline-flex items-center px-4 py-2.5 min-h-[44px] rounded-pill text-[12px] font-600 transition-colors',
         active ? 'bg-brand text-white' : 'bg-card border border-border text-foreground hover:border-brand/40')}>
       {children}
     </button>
