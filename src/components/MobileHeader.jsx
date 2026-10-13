@@ -8,7 +8,7 @@ export default function MobileHeader() {
   const location = useLocation();
   const navigate = useNavigate();
   const isAdmin = user?.role === 'admin';
-  const ROOT_TABS = ['/', '/pedidos', '/promociones', '/perfil', '/admin'];
+  const ROOT_TABS = ['/', '/pedidos', '/promociones', '/perfil', '/admin', '/admin/reportes'];
   const isSubroute = !ROOT_TABS.includes(location.pathname);
   return (
     <header className="sticky top-0 z-30 bg-card border-b border-hair select-none" style={{ paddingTop: 'env(safe-area-inset-top)' }}>

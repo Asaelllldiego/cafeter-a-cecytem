@@ -20,7 +20,10 @@ export default function Layout() {
         {!isMobile && <Sidebar />}
         <main
           className={!isMobile ? 'lg:ml-[240px]' : 'pb-[68px]'}
-          style={isMobile ? { paddingBottom: 'calc(68px + env(safe-area-inset-bottom))' } : undefined}
+          style={isMobile ? {
+            paddingTop: 'calc(3.5rem + env(safe-area-inset-top))',
+            paddingBottom: 'calc(68px + env(safe-area-inset-bottom))'
+          } : undefined}
         >
           <AnimatePresence mode="wait">
             <motion.div
