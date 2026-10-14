@@ -26,8 +26,9 @@ export default function CheckoutPanel({ onDone, mobile }) {
         customer_name: customerName || 'Estudiante',
         notes,
       });
-      if (!res || !res.ok) {
-        throw new Error(res?.error || 'order_failed');
+      const d = res?.data || {};
+      if (!d.ok) {
+        throw new Error(d.error || 'order_failed');
       }
       setSuccess(true);
       clearCart();

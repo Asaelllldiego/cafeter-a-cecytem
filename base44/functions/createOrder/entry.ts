@@ -83,7 +83,7 @@ export default async function (req: Request): Promise<Response> {
       customer_name: customerName,
       notes,
       item_count: itemCount,
-      created_by_id: user.id,
+      customer_user_id: user.id, // ownership for RLS read (created_by_id is service-stamped)
     });
 
     return Response.json({ ok: true, order });
