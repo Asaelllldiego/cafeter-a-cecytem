@@ -131,6 +131,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Patch the in-memory user without an extra network call. Used after a
+  // successful updateMe so the save resolves to a success state immediately
+  // — a follow-up me() could 401 on a borderline session and let the SDK
+  // redirect to /login before the success message ever shows.
+  const patchUser = (partial) => {
+    setUser(prev => prev ? { ...prev, ...partial } : prev);
+  };
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -144,7 +152,8 @@ export const AuthProvider = ({ children }) => {
       navigateToLogin,
       checkUserAuth,
       checkAppState,
-      refreshUser
+      refreshUser,
+      patchUser
     }}>
       {children}
     </AuthContext.Provider>

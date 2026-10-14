@@ -7,7 +7,7 @@ import MobileSelect from '@/components/MobileSelect';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 
 export default function Perfil() {
-  const { user, refreshUser } = useAuth();
+  const { user, patchUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -47,7 +47,7 @@ export default function Perfil() {
   const save = async () => {
     setSaving(true);
     try {
-      await base44.auth.updateMe({
+      const updated = await base44.auth.updateMe({
         phone: form.phone,
         grade: form.grade,
         group: form.group,
@@ -56,7 +56,18 @@ export default function Perfil() {
         notify_orders: form.notify_orders,
         notify_promos: form.notify_promos,
       });
-      await refreshUser();
+      // Patch the in-memory user from the save result instead of re-fetching
+      // me(), which could 401 on a borderline session and redirect to /login.
+      patchUser({
+        ...(updated || {}),
+        phone: form.phone,
+        grade: form.grade,
+        group: form.group,
+        shift: form.shift,
+        student_id: form.student_id,
+        notify_orders: form.notify_orders,
+        notify_promos: form.notify_promos,
+      });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (e) {
