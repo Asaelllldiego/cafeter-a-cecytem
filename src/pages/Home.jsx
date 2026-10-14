@@ -8,6 +8,7 @@ import DaySelector, { todayWeekday } from '@/components/DaySelector';
 import ScheduleBadge from '@/components/ScheduleBadge';
 import FaqSection from '@/components/FaqSection';
 import SiteFooter from '@/components/SiteFooter';
+import RoleOnboarding from '@/components/RoleOnboarding';
 import { Loader2, Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -52,6 +53,7 @@ export default function Home() {
 
   return (
     <PullToRefresh onRefresh={async () => { await queryClient.invalidateQueries({ queryKey: ['menuItems'] }); }}>
+    <RoleOnboarding />
     <div className="lg:flex">
       <div className="flex-1 min-w-0 px-4 lg:px-8 py-5 lg:py-7">
         <div className="hidden lg:block mb-4">
