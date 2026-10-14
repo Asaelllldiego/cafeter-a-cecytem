@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useTeacherArea } from '@/lib/TeacherAreaContext';
 import TeacherPasswordGate from '@/components/TeacherPasswordGate';
 import MenuCard from '@/components/MenuCard';
@@ -9,6 +9,28 @@ import { base44 } from '@/api/base44Client';
 import { Loader2, Search, X, LogOut, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
+
+// Valida la sesión del Área de Maestros contra el servidor al montar.
+// Si la sesión está caduca (p. ej. el admin rotó la contraseña/secreto),
+// se limpia y se muestra la puerta de contraseña en lugar de dejar entrar
+// con un token inválido que luego no marcaría el pedido como profesor.
+function useValidateTeacherSession() {
+  const { isAuthed, session, clearIfInvalid } = useTeacherArea();
+  const [validated, setValidated] = useState(!isAuthed);
+  useEffect(() => {
+    if (!isAuthed || !session) { setValidated(true); return; }
+    let cancelled = false;
+    base44.functions.invoke('checkTeacherSession', { token: session.token, version: session.version })
+      .then(res => {
+        if (cancelled) return;
+        if (!(res && res.data && res.data.valid)) clearIfInvalid();
+      })
+      .catch(() => { if (!cancelled) clearIfInvalid(); })
+      .finally(() => { if (!cancelled) setValidated(true); });
+    return () => { cancelled = true; };
+  }, [isAuthed, session, clearIfInvalid]);
+  return validated;
+}
 
 // Mismas categorías y metadatos que Inicio, para que el catálogo sea
 // consistente entre ambas secciones.
@@ -24,7 +46,17 @@ const CAT_META = {
 
 export default function TeacherArea() {
   const { isAuthed, logout } = useTeacherArea();
+  const validated = useValidateTeacherSession();
   if (!isAuthed) return <TeacherPasswordGate />;
+  // Mientras se valida la sesión contra el servidor, evitamos renderizar la
+  // tienda: una sesión caduca se limpia y cae al <TeacherPasswordGate>.
+  if (!validated) {
+    return (
+      <div className="grid place-items-center py-24">
+        <Loader2 className="w-7 h-7 animate-spin text-brand" />
+      </div>
+    );
+  }
   return <TeacherShop onLogout={logout} />;
 }
 
