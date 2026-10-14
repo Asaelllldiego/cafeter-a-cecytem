@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Home as HomeIcon, ClipboardList, Tag, User, ShieldCheck } from 'lucide-react';
+import { Home as HomeIcon, ClipboardList, Tag, User, ShieldCheck, GraduationCap } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { cn } from '@/lib/utils';
@@ -16,6 +16,7 @@ function tabForPath(p) {
   if (p.startsWith('/admin')) return '/admin';
   if (p.startsWith('/pedidos')) return '/pedidos';
   if (p.startsWith('/promociones')) return '/promociones';
+  if (p.startsWith('/profesores')) return '/profesores';
   if (p.startsWith('/perfil')) return '/perfil';
   return null;
 }
@@ -65,19 +66,21 @@ export default function BottomNav() {
     { label: 'Menú', path: '/', icon: HomeIcon },
     { label: 'Mis Pedidos', path: '/pedidos', icon: ClipboardList, badge: activeCount },
     { label: 'Promociones', path: '/promociones', icon: Tag },
+    { label: 'Profesores', path: '/profesores', icon: GraduationCap },
     { label: 'Perfil', path: '/perfil', icon: User },
   ];
   const adminItems = [
     { label: 'Menú', path: '/', icon: HomeIcon },
     { label: 'Admin', path: '/admin', icon: ShieldCheck, badge: activeCount },
     { label: 'Reportes', path: '/admin/reportes', icon: Tag },
+    { label: 'Profesores', path: '/profesores', icon: GraduationCap },
     { label: 'Perfil', path: '/perfil', icon: User },
   ];
   const items = isAdmin ? adminItems : userItems;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-30 bg-card border-t border-hair pb-[env(safe-area-inset-bottom)]">
-      <div className="grid grid-cols-4">
+      <div className="grid grid-cols-5">
         {items.map(item => {
           const active = tabForPath(location.pathname) === item.path;
           const Icon = item.icon;

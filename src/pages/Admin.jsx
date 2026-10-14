@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Loader2, ClipboardList, Clock, ChefHat, CheckCircle2, XCircle, RefreshCw, Lock, Tags, Package, BarChart3 } from 'lucide-react';
+import { Loader2, ClipboardList, Clock, ChefHat, CheckCircle2, XCircle, RefreshCw, Lock, Tags, Package, BarChart3, GraduationCap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import AdminProducts from '@/components/AdminProducts';
+import TeacherPasswordManager from '@/components/TeacherPasswordManager';
 
 const STATUS = [
   { key: 'pendiente', label: 'Pendiente', icon: Clock, cls: 'bg-amber-100 text-amber-700' },
@@ -106,10 +107,17 @@ export default function Admin() {
             tab === 'productos' ? 'bg-brand text-white' : 'bg-card border border-border text-foreground')}>
           <Package className="w-4 h-4" /> Productos
         </button>
+        <button onClick={() => setTab('profesores')}
+          className={cn('inline-flex items-center gap-1.5 px-4 py-2 rounded-pill text-[13px] font-600',
+            tab === 'profesores' ? 'bg-brand text-white' : 'bg-card border border-border text-foreground')}>
+          <GraduationCap className="w-4 h-4" /> Profesores
+        </button>
       </div>
 
       {tab === 'productos' ? (
         <AdminProducts />
+      ) : tab === 'profesores' ? (
+        <TeacherPasswordManager />
       ) : (
       <>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">

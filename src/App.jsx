@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -9,7 +9,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import Layout from '@/components/Layout';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { lazy } from 'react';
+import { TeacherAreaProvider } from '@/lib/TeacherAreaContext';
 // Add page imports here
 
 const Home = lazy(() => import('@/pages/Home'));
@@ -20,6 +20,7 @@ const Faq = lazy(() => import('@/pages/Faq'));
 const Perfil = lazy(() => import('@/pages/Perfil'));
 const Reportes = lazy(() => import('@/pages/Reportes'));
 const ProductDetail = lazy(() => import('@/pages/ProductDetail'));
+const TeacherArea = lazy(() => import('@/pages/TeacherArea'));
 const Login = lazy(() => import('@/pages/Login'));
 const Register = lazy(() => import('@/pages/Register'));
 const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'));
@@ -46,27 +47,30 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
-    <Suspense fallback={<FullScreenLoader />}>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
-          <Route element={<Layout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/pedidos" element={<Orders />} />
-            <Route path="/promociones" element={<Promotions />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/faq" element={<Faq />} />
-            <Route path="/perfil" element={<Perfil />} />
-            <Route path="/admin/reportes" element={<Reportes />} />
-            <Route path="/producto/:id" element={<ProductDetail />} />
+    <TeacherAreaProvider>
+      <Suspense fallback={<FullScreenLoader />}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+            <Route element={<Layout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/pedidos" element={<Orders />} />
+              <Route path="/promociones" element={<Promotions />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/faq" element={<Faq />} />
+              <Route path="/perfil" element={<Perfil />} />
+              <Route path="/admin/reportes" element={<Reportes />} />
+              <Route path="/profesores" element={<TeacherArea />} />
+              <Route path="/producto/:id" element={<ProductDetail />} />
+            </Route>
           </Route>
-        </Route>
-        <Route path="*" element={<PageNotFound />} />
-      </Routes>
-    </Suspense>
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+      </Suspense>
+    </TeacherAreaProvider>
   );
 };
 

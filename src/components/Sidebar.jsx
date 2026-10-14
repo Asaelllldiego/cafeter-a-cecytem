@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { UtensilsCrossed, Home as HomeIcon, ClipboardList, Tag, User, Clock, ShieldCheck, HelpCircle, BarChart3 } from 'lucide-react';
+import { UtensilsCrossed, Home as HomeIcon, ClipboardList, Tag, User, Clock, ShieldCheck, HelpCircle, BarChart3, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/AuthContext';
 
@@ -12,6 +12,7 @@ export default function Sidebar() {
     { label: 'Menú', path: '/', icon: HomeIcon },
     ...(!isAdmin ? [{ label: 'Mis Pedidos', path: '/pedidos', icon: ClipboardList }] : []),
     { label: 'Promociones', path: '/promociones', icon: Tag },
+    { label: 'Área de Profesores', path: '/profesores', icon: GraduationCap },
     { label: 'Preguntas frecuentes', path: '/faq', icon: HelpCircle },
     { label: 'Mi perfil', path: '/perfil', icon: User },
     ...(isAdmin ? [{ label: 'Admin pedidos', path: '/admin', icon: ShieldCheck }, { label: 'Reportes', path: '/admin/reportes', icon: BarChart3 }] : []),

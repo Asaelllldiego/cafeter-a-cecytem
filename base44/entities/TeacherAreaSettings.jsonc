@@ -1,0 +1,30 @@
+{
+  "name": "TeacherAreaSettings",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "default": "main"
+    },
+    "password_hash": {
+      "type": "string"
+    },
+    "password_salt": {
+      "type": "string"
+    },
+    "session_secret": {
+      "type": "string"
+    },
+    "session_version": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [],
+  "rls": {
+    "read": false,
+    "create": false,
+    "update": false,
+    "delete": false
+  }
+}
