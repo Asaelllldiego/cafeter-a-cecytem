@@ -1,12 +1,28 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.52";
 import { getSettings, verifyPassword } from "../../shared/teacherAuth.ts";
 
-// Brute-force protection: per-user sliding window with progressive lockout.
-const MAX_ATTEMPTS = 5;
-const WINDOW_MS = 30 * 60 * 1000; // failures counted across a 30-min window
-const LOCKOUT_MS = 15 * 60 * 1000; // 15-min cooldown after MAX_ATTEMPTS failures
+// Brute-force protection:
+//  - Failures are recorded with atomic $push into timestamp arrays. There is
+//    no read-modify-write on a shared counter, so concurrent attempts cannot
+//    collapse into a single increment (the previous last-write-wins hole).
+//  - Limits apply per user, per IP AND globally, so an attacker spinning up
+//    many free accounts still hits the shared global/IP ceiling.
+//  - A small per-failure delay slows tight brute-force loops.
+const MAX_USER = 5;
+const MAX_GLOBAL = 30;
+const MAX_IP = 15;
+const WINDOW_MS = 30 * 60 * 1000; // sliding 30-min window
+const FAILURE_DELAY_MS = 200;
 
-type AttemptEntry = { count: number; first_ts: number; locked_until?: number };
+type NumArr = number[];
+const readArr = (v: any): NumArr =>
+  Array.isArray(v) ? v.filter((t) => typeof t === "number") : [];
+
+function retryAfter(arr: NumArr, now: number): number {
+  if (!arr.length) return Math.ceil(WINDOW_MS / 1000);
+  // timestamps are append-ordered, so the oldest is first.
+  return Math.max(1, Math.ceil((arr[0] + WINDOW_MS - now) / 1000));
+}
 
 export default async function (req: Request): Promise<Response> {
   try {
@@ -20,51 +36,97 @@ export default async function (req: Request): Promise<Response> {
     const password = body && body.password ? String(body.password) : "";
     if (!password) return Response.json({ ok: false, error: "invalid" }, { status: 400 });
 
+    // Client IP (best-effort; sanitized to a safe object key, since dots/colons
+    // in an IP would otherwise be interpreted as nested paths).
+    const rawIp =
+      (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() ||
+      req.headers.get("x-real-ip") ||
+      "";
+    const ipKey = (rawIp || "unknown").replace(/[^a-zA-Z0-9]/g, "_").slice(0, 45);
+
     const settings = await getSettings(base44);
     if (!settings || !settings.password_hash) {
       return Response.json({ ok: false, error: "not_configured" });
     }
 
     const now = Date.now();
-    const log: Record<string, AttemptEntry> =
+    const cutoff = now - WINDOW_MS;
+    const log: any =
       settings.attempt_log && typeof settings.attempt_log === "object"
-        ? { ...(settings.attempt_log as object) }
+        ? settings.attempt_log
         : {};
-    const entry = log[user.id] || null;
 
-    // If the user is currently locked, reject before even verifying.
-    if (entry && entry.locked_until && now < entry.locked_until) {
-      const retryAfter = Math.ceil((entry.locked_until - now) / 1000);
-      return Response.json({ ok: false, error: "locked", retry_after: retryAfter });
+    const userArr = readArr(log?.u?.[user.id]).filter((t) => t > cutoff);
+    const globalArr = readArr(log?.g).filter((t) => t > cutoff);
+    const ipArr = readArr(log?.i?.[ipKey]).filter((t) => t > cutoff);
+
+    // Lock check across all three dimensions, evaluated before verifying.
+    if (userArr.length >= MAX_USER || globalArr.length >= MAX_GLOBAL || ipArr.length >= MAX_IP) {
+      const candidates: NumArr[] = [];
+      if (userArr.length >= MAX_USER) candidates.push(userArr);
+      if (globalArr.length >= MAX_GLOBAL) candidates.push(globalArr);
+      if (ipArr.length >= MAX_IP) candidates.push(ipArr);
+      const retry = Math.min(...candidates.map((a) => retryAfter(a, now)));
+      return Response.json({ ok: false, error: "locked", retry_after: retry });
     }
 
     const valid = await verifyPassword(password, settings.password_hash, settings.password_salt);
 
     if (!valid) {
-      // Sliding window: reset the counter if the previous window expired.
-      const windowExpired = !entry || !entry.first_ts || now - entry.first_ts > WINDOW_MS;
-      const firstTs = windowExpired ? now : entry.first_ts;
-      const count = windowExpired ? 1 : (entry.count || 0) + 1;
-      const next: AttemptEntry = { count, first_ts: firstTs };
-      if (count >= MAX_ATTEMPTS) {
-        next.locked_until = now + LOCKOUT_MS;
-      }
-      log[user.id] = next;
+      // A small per-failure slow-down so each guess costs a little time.
+      await new Promise((r) => setTimeout(r, FAILURE_DELAY_MS));
+
+      const userPath = `attempt_log.u.${user.id}`;
+      const ipPath = `attempt_log.i.${ipKey}`;
+
+      // Prune expired entries first (keeps arrays bounded to the window), then
+      // append this failure. Each call is an atomic update on the single
+      // settings document, so parallel failures all persist their own stamp
+      // instead of one overwriting the others.
       try {
-        await base44.asServiceRole.entities.TeacherAreaSettings.update(settings.id, { attempt_log: log });
+        await base44.asServiceRole.entities.TeacherAreaSettings.updateMany(
+          { id: settings.id },
+          {
+            $pull: {
+              [userPath]: { $lt: cutoff },
+              "attempt_log.g": { $lt: cutoff },
+              [ipPath]: { $lt: cutoff },
+            },
+          }
+        );
+      } catch (_) {}
+      try {
+        await base44.asServiceRole.entities.TeacherAreaSettings.updateMany(
+          { id: settings.id },
+          {
+            $push: {
+              [userPath]: now,
+              "attempt_log.g": now,
+              [ipPath]: now,
+            },
+          }
+        );
       } catch (_) {}
 
-      if (next.locked_until) {
-        return Response.json({ ok: false, error: "locked", retry_after: Math.ceil(LOCKOUT_MS / 1000) });
+      const count = userArr.length + 1; // includes this failure
+      if (count >= MAX_USER) {
+        return Response.json({
+          ok: false,
+          error: "locked",
+          retry_after: retryAfter([...userArr, now], now),
+        });
       }
-      return Response.json({ ok: false, error: "invalid", attempts_left: Math.max(0, MAX_ATTEMPTS - count) });
+      return Response.json({ ok: false, error: "invalid", attempts_left: Math.max(0, MAX_USER - count) });
     }
 
-    // Success: clear this user's attempt history so a later typo starts fresh.
-    if (entry) {
-      delete log[user.id];
+    // Success: clear THIS user's failure history only. Do NOT clear IP/global,
+    // which may be protecting against cross-account abuse from the same source.
+    if (userArr.length > 0) {
       try {
-        await base44.asServiceRole.entities.TeacherAreaSettings.update(settings.id, { attempt_log: log });
+        await base44.asServiceRole.entities.TeacherAreaSettings.updateMany(
+          { id: settings.id },
+          { $unset: { [`attempt_log.u.${user.id}`]: "" } }
+        );
       } catch (_) {}
     }
 
