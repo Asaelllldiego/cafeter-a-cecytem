@@ -20,7 +20,7 @@ export default function Orders() {
   const queryClient = useQueryClient();
   const { data, isLoading: loading } = useQuery({
     queryKey: ['myOrders', user?.id],
-    queryFn: () => base44.entities.Order.filter({ created_by_id: user.id }, { sort: '-created_date', limit: 50 }).then(r => r.items || []),
+    queryFn: () => base44.entities.Order.filter({ customer_user_id: user.id }, { sort: '-created_date', limit: 50 }).then(r => r.items || []),
     enabled: !!user && user.role !== 'admin',
   });
   const orders = data || [];
