@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Loader2, User, Mail, GraduationCap, Phone, Bell, Tag, Save, Check, ShieldCheck, Trash2 } from 'lucide-react';
+import { Loader2, User, Mail, GraduationCap, Phone, Bell, Tag, Save, Check, ShieldCheck, Trash2, Sun } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getRole, ROLE_TEACHER } from '@/lib/userRole';
+import { useTheme, THEMES } from '@/lib/theme';
 import MobileSelect from '@/components/MobileSelect';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 
 export default function Perfil() {
   const { user, patchUser } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -146,6 +148,22 @@ export default function Perfil() {
       </Section>
 
       {/* Preferencias de notificaciones */}
+      <Section title="Apariencia" icon={Sun} subtitle="Elige cómo se ve la app">
+        <div className="grid grid-cols-3 gap-2.5">
+          {THEMES.map(t => (
+            <button key={t.value} onClick={() => setTheme(t.value)}
+              className={cn('flex flex-col items-center justify-center gap-1.5 py-3.5 rounded-xl border text-[12px] font-600 transition-all',
+                theme === t.value ? 'border-brand bg-brand-light text-brand' : 'border-border bg-card text-foreground hover:border-brand/40')}>
+              <span className="text-[18px]">{t.icon}</span>
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <p className="text-[11px] text-muted-foreground mt-2.5 leading-relaxed">
+          {theme === 'auto' ? 'La app seguirá la configuración de tu dispositivo.' : `Tema ${theme === 'dark' ? 'oscuro' : 'claro'} aplicado.`}
+        </p>
+      </Section>
+
       <Section title="Notificaciones" icon={Bell} subtitle="Elige qué avisos quieres recibir">
         <Toggle
           icon={Bell}

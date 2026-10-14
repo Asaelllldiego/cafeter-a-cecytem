@@ -35,9 +35,8 @@
   }
 }
 
-/* Dark mode: se activa automáticamente con la preferencia del sistema */
-@media (prefers-color-scheme: dark) {
-  :root {
+/* Dark mode: se activa con la clase .dark en <html> (manual o automático) */
+.dark {
     --background: 222 16% 10%;
     --foreground: 40 25% 96%;
     --card: 222 16% 13%;
@@ -56,7 +55,6 @@
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
   }
-}
 
 @layer base {
   * {

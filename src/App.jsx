@@ -1,4 +1,5 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
+import { initTheme } from '@/lib/theme';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -76,7 +77,7 @@ const AuthenticatedApp = () => {
 
 
 function App() {
-
+  useEffect(() => { initTheme(); }, []);
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
