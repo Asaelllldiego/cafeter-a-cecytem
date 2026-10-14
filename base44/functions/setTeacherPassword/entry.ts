@@ -13,7 +13,7 @@ export default async function (req: Request): Promise<Response> {
     const body = await req.json().catch(() => ({}));
     const newPwd = body && body.new_password ? String(body.new_password) : "";
     const curPwd = body && body.current_password ? String(body.current_password) : "";
-    if (!newPwd || newPwd.length < 4) {
+    if (!newPwd || newPwd.length < 8) {
       return Response.json({ ok: false, error: "weak" }, { status: 400 });
     }
 
@@ -35,6 +35,7 @@ export default async function (req: Request): Promise<Response> {
         password_salt: salt,
         session_secret: newSecret,
         session_version: newVersion,
+        attempt_log: {}, // reset failed-attempt counters on password change
       });
     } else {
       await base44.asServiceRole.entities.TeacherAreaSettings.create({
@@ -43,6 +44,7 @@ export default async function (req: Request): Promise<Response> {
         password_salt: salt,
         session_secret: newSecret,
         session_version: newVersion,
+        attempt_log: {},
       });
     }
 

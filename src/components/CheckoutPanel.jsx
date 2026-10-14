@@ -19,15 +19,16 @@ export default function CheckoutPanel({ onDone, mobile }) {
     setLoading(true);
     try {
       const finalPickup = pickupTime === 'Personalizado' ? customTime : pickupTime;
-      await base44.entities.Order.create({
-        items: items.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, image_url: i.image_url || '' })),
-        subtotal, tax, total,
-        status: 'pendiente',
+      // Totals/price are recomputed server-side; send only ids + quantities.
+      const res = await base44.functions.invoke('createOrder', {
+        items: items.map(i => ({ id: i.id, quantity: i.quantity })),
         pickup_time: finalPickup,
         customer_name: customerName || 'Estudiante',
         notes,
-        item_count: itemCount
       });
+      if (!res || !res.ok) {
+        throw new Error(res?.error || 'order_failed');
+      }
       setSuccess(true);
       clearCart();
       setTimeout(() => {

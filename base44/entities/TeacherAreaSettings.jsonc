@@ -18,6 +18,10 @@
     "session_version": {
       "type": "number",
       "default": 0
+    },
+    "attempt_log": {
+      "type": "object",
+      "default": {}
     }
   },
   "required": [],
