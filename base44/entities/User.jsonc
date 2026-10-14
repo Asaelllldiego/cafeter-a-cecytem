@@ -7,6 +7,38 @@
         "admin",
         "user"
       ]
+    },
+    "phone": {
+      "type": "string",
+      "description": "Contact phone / WhatsApp"
+    },
+    "grade": {
+      "type": "string",
+      "description": "Student grade / semester"
+    },
+    "group": {
+      "type": "string",
+      "description": "Student group"
+    },
+    "shift": {
+      "type": "string",
+      "enum": [
+        "Matutino",
+        "Vespertino"
+      ],
+      "description": "School shift"
+    },
+    "student_id": {
+      "type": "string",
+      "description": "Student ID / matr\u00edcula"
+    },
+    "notify_orders": {
+      "type": "boolean",
+      "default": true
+    },
+    "notify_promos": {
+      "type": "boolean",
+      "default": true
     }
   },
   "required": [
