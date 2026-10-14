@@ -1,4 +1,5 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.52";
+import { getSettings } from "../../shared/teacherAuth.ts";
 
 // Server-side order creation: the server is the ONLY source of truth for
 // prices, subtotal, tax and total. The client sends only menu item ids +
@@ -20,6 +21,29 @@ export default async function (req: Request): Promise<Response> {
     const pickupTime = body && body.pickup_time ? String(body.pickup_time) : "";
     const customerName = body && body.customer_name ? String(body.customer_name).slice(0, 80) : "Estudiante";
     const notes = body && body.notes ? String(body.notes).slice(0, 500) : "";
+
+    // Detección segura de origen "profesor": se verifica el token de sesión
+    // del Área de Maestros contra la configuración almacenada. Solo si coincide
+    // (token + versión) el pedido se marca como de profesor. Nunca se confía en
+    // un flag enviado por el cliente.
+    const teacherToken = body && body.teacher_token ? String(body.teacher_token) : "";
+    const teacherVersionRaw = Number(body && body.teacher_version);
+    let isTeacher = false;
+    if (teacherToken && Number.isFinite(teacherVersionRaw)) {
+      try {
+        const settings = await getSettings(base44);
+        if (
+          settings &&
+          settings.session_secret &&
+          teacherToken === settings.session_secret &&
+          teacherVersionRaw === (settings.session_version || 0)
+        ) {
+          isTeacher = true;
+        }
+      } catch {
+        // Si la verificación falla, el pedido se procesa como normal.
+      }
+    }
 
     if (rawItems.length === 0) return Response.json({ ok: false, error: "empty_order" }, { status: 400 });
     if (!pickupTime) return Response.json({ ok: false, error: "missing_pickup" }, { status: 400 });
@@ -84,6 +108,7 @@ export default async function (req: Request): Promise<Response> {
       notes,
       item_count: itemCount,
       customer_user_id: user.id, // ownership for RLS read (created_by_id is service-stamped)
+      is_teacher: isTeacher,
     });
 
     return Response.json({ ok: true, order });

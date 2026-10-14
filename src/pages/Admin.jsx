@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Loader2, ClipboardList, Clock, ChefHat, CheckCircle2, XCircle, RefreshCw, Lock, Tags, Package, BarChart3, GraduationCap } from 'lucide-react';
+import { Loader2, ClipboardList, Clock, ChefHat, CheckCircle2, XCircle, RefreshCw, Lock, Tags, Package, BarChart3, GraduationCap, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import AdminProducts from '@/components/AdminProducts';
@@ -146,7 +146,16 @@ export default function Admin() {
         </div>
       ) : (
         <div className="space-y-3">
-          {orders.map(o => <OrderRow key={o.id} order={o} onStatus={setStatus} />)}
+          {[...orders]
+            .sort((a, b) => {
+              // 1) Pedidos de profesor (urgent) arriba; luego los normales.
+              const ta = a.is_teacher ? 0 : 1;
+              const tb = b.is_teacher ? 0 : 1;
+              if (ta !== tb) return ta - tb;
+              // 2) Dentro de cada grupo, los más antiguos primero.
+              return new Date(a.created_date || 0) - new Date(b.created_date || 0);
+            })
+            .map(o => <OrderRow key={o.id} order={o} onStatus={setStatus} />)}
         </div>
       )}
       </>
@@ -178,6 +187,16 @@ function OrderRow({ order, onStatus }) {
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <p className="font-display font-700 text-[15px] text-foreground">{order.customer_name || 'Estudiante'}</p>
+            {order.is_teacher && (
+              <>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-pill text-[10px] font-700 bg-blue-100 text-blue-700">
+                  <GraduationCap className="w-3 h-3" /> PROFES
+                </span>
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-pill text-[10px] font-700 bg-red-100 text-red-700">
+                  <AlertTriangle className="w-3 h-3" /> URGENTE
+                </span>
+              </>
+            )}
             <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded-pill text-[10px] font-600', status.cls)}>
               <Icon className="w-3 h-3" /> {status.label}
             </span>

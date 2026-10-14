@@ -4,12 +4,14 @@ import { base44 } from '@/api/base44Client';
 import { Trash2, Minus, Plus, Clock, Loader2, CheckCircle2, Tag, Clock4 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { isWithinSchedule, SCHEDULE_TEXT } from '@/components/ScheduleBadge';
+import { useTeacherArea } from '@/lib/TeacherAreaContext';
 
 const pickupOptions = ['Receso 1', 'Receso 2', 'Personalizado'];
 
 export default function CheckoutPanel({ onDone, mobile }) {
   const { items, removeItem, updateQuantity, clearCart, subtotal, tax, total, itemCount,
     pickupTime, setPickupTime, customerName, setCustomerName, notes, setNotes } = useCart();
+  const { session } = useTeacherArea();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [customTime, setCustomTime] = useState('');
@@ -20,12 +22,19 @@ export default function CheckoutPanel({ onDone, mobile }) {
     try {
       const finalPickup = pickupTime === 'Personalizado' ? customTime : pickupTime;
       // Totals/price are recomputed server-side; send only ids + quantities.
-      const res = await base44.functions.invoke('createOrder', {
+      // Si hay sesión de Área de Maestros activa, se envía el token para que el
+      // servidor marque el pedido como de profesor (verificado, no confiado).
+      const payload = {
         items: items.map(i => ({ id: i.id, quantity: i.quantity })),
         pickup_time: finalPickup,
         customer_name: customerName || 'Estudiante',
         notes,
-      });
+      };
+      if (session) {
+        payload.teacher_token = session.token;
+        payload.teacher_version = session.version;
+      }
+      const res = await base44.functions.invoke('createOrder', payload);
       const d = res?.data || {};
       if (!d.ok) {
         throw new Error(d.error || 'order_failed');

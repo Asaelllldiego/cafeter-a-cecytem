@@ -61,6 +61,10 @@
     },
     "customer_user_id": {
       "type": "string"
+    },
+    "is_teacher": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [
