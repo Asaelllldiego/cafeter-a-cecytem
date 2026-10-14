@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, RotateCw } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
 import { Image } from '@/components/ui/image';
@@ -8,53 +8,76 @@ import { Image } from '@/components/ui/image';
 const AGENT_NAME = 'jaguar';
 const AVATAR = 'https://media.base44.com/images/public/6abf3821dac7f514f6524981/ac7b990a1_generated_image.png';
 const GREETING = "¡Rawr! 🐯 Soy Jagger, el jaguar de la cafetería CECYTEM. ¿Qué se te antoja hoy? Puedo recomendarte la comida del día o ayudarte a armar tu pedido.";
+const ERROR_REPLY = "Ahora no me pude conectar 🐯 Intenta de nuevo en un momento.";
 
 export default function AgentChat() {
   const [open, setOpen] = useState(false);
   const [conv, setConv] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([{ role: 'assistant', content: GREETING }]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [loadingConv, setLoadingConv] = useState(false);
+  const [convError, setConvError] = useState(false);
   const scrollRef = useRef(null);
 
-  useEffect(() => {
-    if (!open || conv) return;
+  const loadConversation = useCallback(async () => {
     setLoadingConv(true);
+    setConvError(false);
+    try {
+      const list = await base44.agents.listConversations({ agent_name: AGENT_NAME });
+      const listArr = Array.isArray(list) ? list : (list?.items || []);
+      const existing = listArr[0];
+      const conversation = existing || await base44.agents.createConversation({ agent_name: AGENT_NAME, metadata: { name: 'Cafetería CECYTEM' } });
+      setConv(conversation);
+      setMessages(conversation.messages && conversation.messages.length ? conversation.messages : [{ role: 'assistant', content: GREETING }]);
+      return base44.agents.subscribeToConversation(conversation.id, (data) => {
+        setMessages(data.messages || []);
+      });
+    } catch (e) {
+      setConv(null);
+      setConvError(true);
+      setMessages([{ role: 'assistant', content: GREETING }]);
+      return () => {};
+    } finally {
+      setLoadingConv(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
     let unsub = () => {};
+    let cancelled = false;
     (async () => {
-      try {
-        const list = await base44.agents.listConversations({ agent_name: AGENT_NAME });
-        const listArr = Array.isArray(list) ? list : (list?.items || []);
-        const existing = listArr[0];
-        const conversation = existing || await base44.agents.createConversation({ agent_name: AGENT_NAME, metadata: { name: 'Cafetería CECYTEM' } });
-        setConv(conversation);
-        setMessages(conversation.messages && conversation.messages.length ? conversation.messages : [{ role: 'assistant', content: GREETING }]);
-        unsub = base44.agents.subscribeToConversation(conversation.id, (data) => {
-          setMessages(data.messages || []);
-        });
-      } catch (e) {
-        setMessages([{ role: 'assistant', content: GREETING }]);
-      } finally {
-        setLoadingConv(false);
-      }
+      const u = await loadConversation();
+      if (cancelled) { u?.(); return; }
+      unsub = u || (() => {});
     })();
-    return () => unsub();
-  }, [open]);
+    return () => { cancelled = true; unsub(); };
+  }, [open, loadConversation]);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages, busy]);
 
+  const ready = !!conv && !loadingConv;
+
   const send = async () => {
     const text = input.trim();
     if (!text || busy || !conv) return;
+    const userMsg = { role: 'user', content: text };
+    setMessages(prev => [...prev, userMsg]);
     setInput('');
     setBusy(true);
     try {
       await base44.agents.addMessage(conv, { role: 'user', content: text });
+      // Subscription streams the assistant reply; as a safety net, fetch the
+      // final state in case the subscription missed it.
+      try {
+        const fresh = await base44.agents.getConversation(conv.id);
+        if (fresh?.messages) setMessages(fresh.messages);
+      } catch (_) {}
     } catch (e) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Oops, no pude responder ahora. Intenta de nuevo 🐯' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: ERROR_REPLY }]);
     } finally {
       setBusy(false);
     }
@@ -81,7 +104,7 @@ export default function AgentChat() {
 
           <div ref={scrollRef} className="flex-1 overflow-y-auto px-3.5 py-3 space-y-2.5 bg-background">
             {loadingConv && <div className="grid place-items-center py-6"><Loader2 className="w-5 h-5 animate-spin text-brand" /></div>}
-            {messages.map((m, i) => {
+            {!loadingConv && messages.map((m, i) => {
               const isUser = m.role === 'user';
               return (
                 <div key={i} className={cn('flex', isUser ? 'justify-end' : 'justify-start')}>
@@ -104,13 +127,22 @@ export default function AgentChat() {
                 <div className="bg-card border border-hair rounded-2xl rounded-bl-md px-3.5 py-2 text-[13px] text-mutedink">Jagger está escribiendo...</div>
               </div>
             )}
+            {convError && !loadingConv && (
+              <div className="grid place-items-center py-4 text-center">
+                <p className="text-[12px] text-mutedink mb-2">No pude cargar la conversación.</p>
+                <button onClick={loadConversation} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-pill bg-muted text-foreground text-[12px] font-600">
+                  <RotateCw className="w-3.5 h-3.5" /> Reintentar
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-2 px-3 py-2.5 border-t border-hair bg-card">
             <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()}
-              placeholder="Pregúntame por el menú..."
-              className="flex-1 px-3.5 py-2.5 rounded-full border border-hair bg-background text-[13px] focus:outline-none focus:border-brand" />
-            <button onClick={send} disabled={busy || !input.trim()}
+              disabled={!ready}
+              placeholder={ready ? 'Pregúntame por el menú...' : 'Cargando conversación...'}
+              className="flex-1 px-3.5 py-2.5 rounded-full border border-hair bg-background text-[13px] focus:outline-none focus:border-brand disabled:opacity-60" />
+            <button onClick={send} disabled={busy || !input.trim() || !ready}
               className="grid place-items-center w-10 h-10 rounded-full bg-mustard text-onaccent hover:bg-mustard-dark hover:text-white disabled:opacity-50 active:scale-90 transition">
               <Send className="w-[18px] h-[18px]" />
             </button>
