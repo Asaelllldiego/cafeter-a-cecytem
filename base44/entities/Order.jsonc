@@ -58,6 +58,9 @@
     "item_count": {
       "type": "number",
       "default": 0
+    },
+    "customer_user_id": {
+      "type": "string"
     }
   },
   "required": [
@@ -70,6 +73,9 @@
       "$or": [
         {
           "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.customer_user_id": "{{user.id}}"
         },
         {
           "user_condition": {
