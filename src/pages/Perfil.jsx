@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Loader2, User, Mail, GraduationCap, Phone, Bell, Tag, Save, Check, ShieldCheck, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getRole, ROLE_TEACHER } from '@/lib/userRole';
 import MobileSelect from '@/components/MobileSelect';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 
@@ -82,6 +83,13 @@ export default function Perfil() {
   }
 
   const isAdmin = user?.role === 'admin';
+  const isTeacher = !isAdmin && getRole() === ROLE_TEACHER;
+
+  const roleBadge = isAdmin
+    ? { cls: 'bg-brand text-white', icon: <ShieldCheck className="w-3 h-3" />, label: 'Administrador' }
+    : isTeacher
+      ? { cls: 'bg-blue-100 text-blue-700', icon: <GraduationCap className="w-3 h-3" />, label: 'Profesor' }
+      : { cls: 'bg-muted text-foreground', icon: null, label: 'Estudiante' };
 
   return (
     <div className="px-4 lg:px-8 py-5 lg:py-7 max-w-3xl mx-auto">
@@ -97,9 +105,8 @@ export default function Perfil() {
           <div className="min-w-0">
             <p className="font-display font-700 text-[20px] text-foreground truncate">{user?.full_name || 'Estudiante'}</p>
             <p className="text-[13px] text-muted-foreground flex items-center gap-1.5 truncate"><Mail className="w-3.5 h-3.5" /> {user?.email || '—'}</p>
-            <span className={cn('inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-pill text-[10px] font-700',
-              isAdmin ? 'bg-brand text-white' : 'bg-muted text-foreground')}>
-              {isAdmin ? <><ShieldCheck className="w-3 h-3" /> Administrador</> : 'Estudiante'}
+            <span className={cn('inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-pill text-[10px] font-700', roleBadge.cls)}>
+              {roleBadge.icon}{roleBadge.label}
             </span>
           </div>
         </div>
