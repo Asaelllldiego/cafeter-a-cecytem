@@ -10,8 +10,13 @@ export default async function (req: Request): Promise<Response> {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     // 1) Delete the user's order history (service role bypasses RLS).
+    // createOrder stores the owning user in `customer_user_id` (created_by_id is
+    // service-stamped there), so filter on that. Match created_by_id too via $or
+    // in case any order was created directly by the user.
     try {
-      await base44.asServiceRole.entities.Order.deleteMany({ created_by_id: user.id });
+      await base44.asServiceRole.entities.Order.deleteMany({
+        $or: [{ customer_user_id: user.id }, { created_by_id: user.id }],
+      });
     } catch (e) {
       // best-effort; continue to PII cleanup
     }
