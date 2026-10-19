@@ -39,9 +39,22 @@ export async function verifyPassword(password, hashHex, saltHex) {
 }
 
 export async function getSettings(base44) {
-  const res = await base44.asServiceRole.entities.TeacherAreaSettings.filter({}, { limit: 1 });
+  // Read by the stable key "main" (newest first), so the verification and the
+  // session check always resolve to the same settings record even if old or
+  // duplicate rows exist in the collection.
+  const res = await base44.asServiceRole.entities.TeacherAreaSettings.filter(
+    { key: "main" },
+    { sort: "-created_date", limit: 1 }
+  );
   const items = (res && res.items) || [];
-  return items[0] || null;
+  if (items[0]) return items[0];
+  // Fallback for legacy rows saved without the key field.
+  const legacy = await base44.asServiceRole.entities.TeacherAreaSettings.filter(
+    { key: { $exists: false } },
+    { sort: "-created_date", limit: 1 }
+  );
+  const legacyItems = (legacy && legacy.items) || [];
+  return legacyItems[0] || null;
 }
 
 export function freshToken() {

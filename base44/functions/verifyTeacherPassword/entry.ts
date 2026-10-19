@@ -136,6 +136,7 @@ export default async function (req: Request): Promise<Response> {
       version: settings.session_version || 0,
     });
   } catch (error) {
+    console.error("verifyTeacherPassword failed:", error && (error.stack || error.message || error));
     return Response.json({ ok: false, error: "server" }, { status: 500 });
   }
 }

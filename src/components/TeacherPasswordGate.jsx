@@ -17,9 +17,16 @@ export default function TeacherPasswordGate() {
     const res = await login(password);
     setLoading(false);
     if (!res.ok) {
-      setError(res.error === 'not_configured'
-        ? 'El acceso al área aún no está configurado. Pide al administrador que habilite la contraseña.'
-        : 'Contraseña no válida. Inténtalo de nuevo.');
+      if (res.error === 'not_configured') {
+        setError('El acceso al área aún no está configurado. Pide al administrador que habilite la contraseña.');
+      } else if (res.error === 'locked') {
+        const mins = Math.max(1, Math.ceil((res.retry_after || 1800) / 60));
+        setError(`Demasiados intentos fallidos. Espera ${mins} minuto${mins === 1 ? '' : 's'} antes de volver a intentar.`);
+      } else if (res.attempts_left != null) {
+        setError(`Contraseña no válida. Te quedan ${res.attempts_left} intento${res.attempts_left === 1 ? '' : 's'}.`);
+      } else {
+        setError('Contraseña no válida. Inténtalo de nuevo.');
+      }
     }
   };
 

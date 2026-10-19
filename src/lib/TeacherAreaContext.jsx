@@ -26,7 +26,7 @@ export function TeacherAreaProvider({ children }) {
         setSession(s);
         return { ok: true };
       }
-      return { ok: false, error: d.error || 'server' };
+      return { ok: false, error: d.error || 'server', retry_after: d.retry_after, attempts_left: d.attempts_left };
     } catch {
       return { ok: false, error: 'server' };
     }
