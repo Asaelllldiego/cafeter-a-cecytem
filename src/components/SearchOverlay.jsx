@@ -63,11 +63,17 @@ export default function SearchOverlay({ open, onClose }) {
         {isLoading ? (
           <div className="grid place-items-center py-16"><Loader2 className="w-7 h-7 animate-spin text-brand" /></div>
         ) : !searching ? (
-          <div className="text-center py-14">
-            <div className="grid place-items-center w-14 h-14 rounded-2xl bg-brand-light text-brand mx-auto mb-3"><ShoppingBasket className="w-7 h-7" /></div>
-            <p className="font-display font-700 text-[16px] text-foreground">¿Qué se te antoja?</p>
-            <p className="text-[13px] text-muted-foreground mt-1">Escribe el nombre de un producto para encontrarlo al instante</p>
-          </div>
+          <>
+            <div className="text-center py-8">
+              <div className="grid place-items-center w-14 h-14 rounded-2xl bg-brand-light text-brand mx-auto mb-3"><ShoppingBasket className="w-7 h-7" /></div>
+              <p className="font-display font-700 text-[16px] text-foreground">¿Qué se te antoja?</p>
+              <p className="text-[13px] text-muted-foreground mt-1">Escribe el nombre de un producto para encontrarlo al instante</p>
+            </div>
+            <p className="text-[11px] font-600 uppercase tracking-wider text-mutedink mb-3">Sugerencias</p>
+            <div className="grid grid-cols-2 gap-3 pb-6">
+              {items.filter(i => i.available !== false).slice(0, 4).map(item => <MenuCard key={item.id} item={item} />)}
+            </div>
+          </>
         ) : results.length === 0 ? (
           <div className="text-center py-14">
             <p className="text-4xl mb-2">🔍</p>
