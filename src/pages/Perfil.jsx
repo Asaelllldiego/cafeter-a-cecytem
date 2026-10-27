@@ -14,6 +14,7 @@ export default function Perfil() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState(null);
   const [form, setForm] = useState({
     phone: '',
     grade: '',
@@ -49,6 +50,7 @@ export default function Perfil() {
 
   const save = async () => {
     setSaving(true);
+    setError(null);
     try {
       const updated = await base44.auth.updateMe({
         phone: form.phone,
@@ -75,6 +77,12 @@ export default function Perfil() {
       setTimeout(() => setSaved(false), 2000);
     } catch (e) {
       console.error(e);
+      // Nunca dejar un guardado fallido en silencio: el usuario debe saber
+      // si sus cambios se guardaron o no. Si la sesión expiró, decírselo.
+      const expired = e && (e.status === 401 || e.status === 403);
+      setError(expired
+        ? 'Tu sesión expiró y tus cambios no se guardaron. Inicia sesión de nuevo e inténtalo otra vez.'
+        : 'Tus cambios no se pudieron guardar. Revisa tu conexión e inténtalo de nuevo.');
     } finally {
       setSaving(false);
     }
@@ -188,6 +196,10 @@ export default function Perfil() {
           : saved ? <><Check className="w-5 h-5" /> Cambios guardados</>
           : <><Save className="w-5 h-5" /> Guardar cambios</>}
       </button>
+
+      {error && (
+        <p className="mt-2 text-[13px] text-destructive bg-red-50 border border-red-200 rounded-xl px-3.5 py-2.5">{error}</p>
+      )}
 
       <AlertDialog>
         <AlertDialogTrigger asChild>
