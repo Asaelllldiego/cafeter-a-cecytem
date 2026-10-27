@@ -9,6 +9,7 @@ import { base44 } from '@/api/base44Client';
 import { Loader2, Search, X, LogOut, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Valida la sesión del Área de Maestros contra el servidor al montar.
 // Si la sesión está caduca (p. ej. el admin rotó la contraseña/secreto),
@@ -61,6 +62,7 @@ export default function TeacherArea() {
 }
 
 function TeacherShop({ onLogout }) {
+  const isMobile = useIsMobile();
   const [day, setDay] = useState(todayWeekday());
   const [q, setQ] = useState('');
   const [activeCat, setActiveCat] = useState('todas');
@@ -153,10 +155,14 @@ function TeacherShop({ onLogout }) {
         )}
       </div>
 
-      {/* Carrito de escritorio: reutiliza el mismo CheckoutPanel de Inicio */}
-      <div className="hidden lg:block w-[340px] shrink-0 border-l border-border bg-card sticky top-0 h-screen overflow-hidden">
-        <CheckoutPanel />
-      </div>
+      {/* Carrito de escritorio: reutiliza el mismo CheckoutPanel de Inicio.
+          Solo en escritorio: en móvil se usa la hoja de la barra flotante,
+          evitando un segundo formulario oculto en el DOM. */}
+      {!isMobile && (
+        <div className="hidden lg:block w-[340px] shrink-0 border-l border-border bg-card sticky top-0 h-screen overflow-hidden">
+          <CheckoutPanel />
+        </div>
+      )}
     </div>
   );
 }

@@ -13,6 +13,7 @@ import { Loader2, Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import PullToRefresh from '@/components/PullToRefresh';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const CAT_ORDER = ['Comida (diario)', 'Bebidas', 'Especiales', 'Higiene', 'Snacks', 'Postres'];
 const CAT_META = {
@@ -25,6 +26,7 @@ const CAT_META = {
 };
 
 export default function Home() {
+  const isMobile = useIsMobile();
   const [day, setDay] = useState(todayWeekday());
   const [q, setQ] = useState('');
   const [activeCat, setActiveCat] = useState('todas');
@@ -121,9 +123,14 @@ export default function Home() {
         <SiteFooter />
       </div>
 
-      <div className="hidden lg:block w-[340px] shrink-0 border-l border-border bg-card sticky top-0 h-screen overflow-hidden">
-        <CheckoutPanel />
-      </div>
+      {/* Carrito de escritorio: solo en escritorio; en móvil se usa la hoja
+          de la barra flotante. Evita un segundo formulario oculto en el DOM
+          móvil, cuyo campo de nombre capta el tecleo del campo visible. */}
+      {!isMobile && (
+        <div className="hidden lg:block w-[340px] shrink-0 border-l border-border bg-card sticky top-0 h-screen overflow-hidden">
+          <CheckoutPanel />
+        </div>
+      )}
     </div>
     </PullToRefresh>
   );

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useCart } from '@/lib/CartContext';
-import { Loader2, ArrowLeft, Clock, Minus, Plus, ShoppingCart, Check, Flame, AlertTriangle } from 'lucide-react';
+import { Loader2, ArrowLeft, Clock, Minus, Plus, ShoppingCart, Check, Flame, AlertTriangle, PackageCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function ProductDetail() {
@@ -102,23 +102,32 @@ export default function ProductDetail() {
               <span className="text-[11px] font-600 text-brand uppercase tracking-wide">{item.category}</span>
               <h1 className="font-display font-700 text-[26px] lg:text-[30px] text-foreground leading-tight mt-1">{item.name}</h1>
             </div>
-            <span className="flex items-center gap-1.5 text-[12px] text-mutedink shrink-0 mt-2 bg-muted px-2.5 py-1.5 rounded-pill">
-              <Clock className="w-3.5 h-3.5" /> {item.prep_time || '5 min'}
-            </span>
+            <div className="flex flex-col items-end gap-1.5 shrink-0 mt-2">
+              <span className="flex items-center gap-1.5 text-[12px] text-mutedink bg-muted px-2.5 py-1.5 rounded-pill">
+                <Clock className="w-3.5 h-3.5" /> {item.prep_time || '5 min'}
+              </span>
+              {!outOfStock && (
+                <span className="flex items-center gap-1.5 text-[12px] text-mutedink bg-muted px-2.5 py-1.5 rounded-pill">
+                  <PackageCheck className="w-3.5 h-3.5" /> {lowStock ? '¡Solo ' : ''}{item.stock} disponible{item.stock === 1 ? '' : 's'}{lowStock ? '!' : ''}
+                </span>
+              )}
+            </div>
           </div>
 
           <p className="text-[14px] text-mutedink leading-relaxed mt-3">{item.description || 'Sin descripción disponible.'}</p>
 
-          {ingredients.length > 0 && (
-            <div className="mt-5">
-              <h2 className="font-display font-700 text-[15px] text-foreground mb-2">Ingredientes</h2>
+          <div className="mt-5">
+            <h2 className="font-display font-700 text-[15px] text-foreground mb-2">Ingredientes</h2>
+            {ingredients.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
                 {ingredients.map((ing, i) => (
                   <span key={i} className="px-2.5 py-1 rounded-pill bg-brand-light text-brand text-[12px] font-600">{ing}</span>
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <p className="text-[12px] text-mutedink">La cooperativa no ha especificado los ingredientes de este producto.</p>
+            )}
+          </div>
 
           {item.is_combo && (
             <div className="mt-5 p-3 rounded-2xl bg-mustard-light">
