@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { UtensilsCrossed, Search, ShieldCheck, HelpCircle, User, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
+import SearchOverlay from '@/components/SearchOverlay';
 
 export default function MobileHeader() {
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const isAdmin = user?.role === 'admin';
+  const [showSearch, setShowSearch] = useState(false);
   const ROOT_TABS = ['/', '/pedidos', '/promociones', '/perfil', '/admin', '/admin/reportes'];
   const isSubroute = !ROOT_TABS.includes(location.pathname);
   return (
@@ -40,11 +42,12 @@ export default function MobileHeader() {
           <Link to="/perfil" className="grid place-items-center w-10 h-10 rounded-full hover:bg-muted text-foreground">
             <User className="w-5 h-5" />
           </Link>
-          <button className="grid place-items-center w-10 h-10 rounded-full hover:bg-muted text-foreground">
+          <button onClick={() => setShowSearch(true)} aria-label="Buscar productos" className="grid place-items-center w-10 h-10 rounded-full hover:bg-muted text-foreground">
             <Search className="w-5 h-5" />
           </button>
         </div>
       </div>
+      <SearchOverlay open={showSearch} onClose={() => setShowSearch(false)} />
     </header>
   );
 }
