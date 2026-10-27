@@ -6,11 +6,13 @@ import { cn } from '@/lib/utils';
 import { getRole, ROLE_TEACHER } from '@/lib/userRole';
 import { useTheme, THEMES } from '@/lib/theme';
 import MobileSelect from '@/components/MobileSelect';
+import { useToast } from '@/components/ui/use-toast';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
 
 export default function Perfil() {
   const { user, patchUser } = useAuth();
   const { theme, setTheme } = useTheme();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -74,6 +76,10 @@ export default function Perfil() {
         notify_promos: form.notify_promos,
       });
       setSaved(true);
+      toast({
+        title: '✓ Cambios guardados',
+        description: 'Tu información de perfil se actualizó correctamente.',
+      });
       setTimeout(() => setSaved(false), 2000);
     } catch (e) {
       console.error(e);
