@@ -8,13 +8,22 @@ import { useTeacherArea } from '@/lib/TeacherAreaContext';
 
 const pickupOptions = ['Receso 1', 'Receso 2', 'Personalizado'];
 
-export default function CheckoutPanel({ onDone, mobile }) {
+export default function CheckoutPanel({ onDone, mobile, customerName: nameProp, onCustomerNameChange, notes: notesProp, onNotesChange }) {
   const { items, removeItem, updateQuantity, clearCart, subtotal, tax, total, itemCount,
-    pickupTime, setPickupTime, customerName, setCustomerName, notes, setNotes } = useCart();
+    pickupTime, setPickupTime } = useCart();
   const { session } = useTeacherArea();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [customTime, setCustomTime] = useState('');
+  // Nombre y notas: estado local del panel (cada tecla solo re-renderiza
+  // este formulario, no toda la página). La hoja móvil los pasa como
+  // props para que no se pierdan al cerrar y reabrir el carrito.
+  const [localName, setLocalName] = useState('');
+  const [localNotes, setLocalNotes] = useState('');
+  const customerName = nameProp !== undefined ? nameProp : localName;
+  const setCustomerName = onCustomerNameChange || setLocalName;
+  const notes = notesProp !== undefined ? notesProp : localNotes;
+  const setNotes = onNotesChange || setLocalNotes;
 
   const handleConfirm = async () => {
     if (items.length === 0) return;
@@ -41,6 +50,7 @@ export default function CheckoutPanel({ onDone, mobile }) {
       }
       setSuccess(true);
       clearCart();
+      setNotes('');
       setTimeout(() => {
         setSuccess(false);
         if (onDone) onDone();

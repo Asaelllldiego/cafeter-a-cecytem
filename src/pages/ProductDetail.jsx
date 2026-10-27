@@ -102,19 +102,29 @@ export default function ProductDetail() {
               <span className="text-[11px] font-600 text-brand uppercase tracking-wide">{item.category}</span>
               <h1 className="font-display font-700 text-[26px] lg:text-[30px] text-foreground leading-tight mt-1">{item.name}</h1>
             </div>
-            <div className="flex flex-col items-end gap-1.5 shrink-0 mt-2">
-              <span className="flex items-center gap-1.5 text-[12px] text-mutedink bg-muted px-2.5 py-1.5 rounded-pill">
-                <Clock className="w-3.5 h-3.5" /> {item.prep_time || '5 min'}
-              </span>
-              {!outOfStock && (
-                <span className="flex items-center gap-1.5 text-[12px] text-mutedink bg-muted px-2.5 py-1.5 rounded-pill">
-                  <PackageCheck className="w-3.5 h-3.5" /> {lowStock ? '¡Solo ' : ''}{item.stock} disponible{item.stock === 1 ? '' : 's'}{lowStock ? '!' : ''}
-                </span>
-              )}
-            </div>
           </div>
 
           <p className="text-[14px] text-mutedink leading-relaxed mt-3">{item.description || 'Sin descripción disponible.'}</p>
+
+          {/* Info clave siempre visible y etiquetada: preparación y existencias */}
+          <div className="mt-5 grid grid-cols-2 gap-2.5">
+            <div className="flex items-center gap-2.5 bg-muted rounded-2xl px-3.5 py-3">
+              <Clock className="w-5 h-5 text-brand shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[10px] font-600 uppercase tracking-wide text-mutedink">Preparación</p>
+                <p className="text-[13px] font-700 text-foreground leading-tight">{item.prep_time || '5 min'}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2.5 bg-muted rounded-2xl px-3.5 py-3">
+              <PackageCheck className="w-5 h-5 text-brand shrink-0" />
+              <div className="min-w-0">
+                <p className="text-[10px] font-600 uppercase tracking-wide text-mutedink">Existencias</p>
+                <p className={cn('text-[13px] font-700 leading-tight', outOfStock ? 'text-mutedink' : lowStock ? 'text-destructive' : 'text-foreground')}>
+                  {outOfStock ? 'Agotado' : lowStock ? `¡Solo ${item.stock}!` : `${item.stock} disponibles`}
+                </p>
+              </div>
+            </div>
+          </div>
 
           <div className="mt-5">
             <h2 className="font-display font-700 text-[15px] text-foreground mb-2">Ingredientes</h2>

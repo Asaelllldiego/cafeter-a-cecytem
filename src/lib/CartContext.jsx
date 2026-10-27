@@ -1,12 +1,14 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 
 const CartContext = createContext(null);
 
+// Estado global del carrito: SOLO lo que necesitan varias pantallas
+// (artículos y hora de recogida). El nombre y las notas viven en
+// CheckoutPanel: si estuvieran aquí, cada tecla re-renderizaría todo
+// el menú y se perderían caracteres al teclear.
 export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
   const [pickupTime, setPickupTime] = useState('Receso 1');
-  const [customerName, setCustomerName] = useState('');
-  const [notes, setNotes] = useState('');
 
   const addItem = useCallback((item) => {
     setItems(prev => {
@@ -32,7 +34,6 @@ export function CartProvider({ children }) {
 
   const clearCart = useCallback(() => {
     setItems([]);
-    setNotes('');
   }, []);
 
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
@@ -40,12 +41,14 @@ export function CartProvider({ children }) {
   const tax = Math.round(subtotal * 0.16 * 100) / 100;
   const total = Math.round((subtotal + tax) * 100) / 100;
 
+  const value = useMemo(() => ({
+    items, addItem, removeItem, updateQuantity, clearCart,
+    itemCount, subtotal, tax, total,
+    pickupTime, setPickupTime
+  }), [items, pickupTime, itemCount, subtotal, tax, total, addItem, removeItem, updateQuantity, clearCart]);
+
   return (
-    <CartContext.Provider value={{
-      items, addItem, removeItem, updateQuantity, clearCart,
-      itemCount, subtotal, tax, total,
-      pickupTime, setPickupTime, customerName, setCustomerName, notes, setNotes
-    }}>
+    <CartContext.Provider value={value}>
       {children}
     </CartContext.Provider>
   );

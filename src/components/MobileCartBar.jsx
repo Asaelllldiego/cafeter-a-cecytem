@@ -7,6 +7,10 @@ import CheckoutPanel from '@/components/CheckoutPanel';
 export default function MobileCartBar() {
   const { itemCount, total, pickupTime } = useCart();
   const [open, setOpen] = useState(false);
+  // Nombre y notas viven aquí (no dentro del panel) para sobrevivir al
+  // cierre de la hoja; el tecleo solo re-renderiza la barra y la hoja.
+  const [customerName, setCustomerName] = useState('');
+  const [notes, setNotes] = useState('');
   if (itemCount === 0) return null;
   return (
     <>
@@ -23,7 +27,9 @@ export default function MobileCartBar() {
       </button>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="bottom" className="p-0 max-h-[85vh] overflow-hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-          <CheckoutPanel onDone={() => setOpen(false)} mobile />
+          <CheckoutPanel onDone={() => setOpen(false)} mobile
+            customerName={customerName} onCustomerNameChange={setCustomerName}
+            notes={notes} onNotesChange={setNotes} />
         </SheetContent>
       </Sheet>
     </>
