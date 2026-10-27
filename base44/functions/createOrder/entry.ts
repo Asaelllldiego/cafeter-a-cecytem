@@ -22,6 +22,18 @@ export default async function (req: Request): Promise<Response> {
     const customerName = body && body.customer_name ? String(body.customer_name).slice(0, 80) : "Estudiante";
     const notes = body && body.notes ? String(body.notes).slice(0, 500) : "";
 
+    // Pedido programado (fuera de horario): el cliente envía la fecha de la
+    // próxima apertura. Solo se aceptan fechas válidas y futuras.
+    const scheduledForRaw = body && body.scheduled_for ? String(body.scheduled_for) : "";
+    let scheduledFor = "";
+    if (scheduledForRaw) {
+      const d = new Date(scheduledForRaw);
+      if (Number.isNaN(d.getTime()) || d.getTime() <= Date.now()) {
+        return Response.json({ ok: false, error: "invalid_schedule" }, { status: 400 });
+      }
+      scheduledFor = d.toISOString();
+    }
+
     // Detección segura de origen "profesor": se verifica el token de sesión
     // del Área de Maestros contra la configuración almacenada. Solo si coincide
     // (token + versión) el pedido se marca como de profesor. Nunca se confía en
@@ -109,6 +121,7 @@ export default async function (req: Request): Promise<Response> {
       item_count: itemCount,
       customer_user_id: user.id, // ownership for RLS read (created_by_id is service-stamped)
       is_teacher: isTeacher,
+      ...(scheduledFor ? { scheduled_for: scheduledFor } : {}),
     });
 
     return Response.json({ ok: true, order });

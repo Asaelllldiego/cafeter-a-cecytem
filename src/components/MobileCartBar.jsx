@@ -11,7 +11,9 @@ export default function MobileCartBar() {
   // cierre de la hoja; el tecleo solo re-renderiza la barra y la hoja.
   const [customerName, setCustomerName] = useState('');
   const [notes, setNotes] = useState('');
-  if (itemCount === 0) return null;
+  // Mientras la hoja está abierta no se desmonta aunque el carrito quede
+  // vacío, para que el aviso de "¡Pedido confirmado!" llegue a verse.
+  if (itemCount === 0 && !open) return null;
   return (
     <>
       <button onClick={() => setOpen(true)}

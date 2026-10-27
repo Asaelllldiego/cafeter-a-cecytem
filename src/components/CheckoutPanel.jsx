@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useCart } from '@/lib/CartContext';
 import { base44 } from '@/api/base44Client';
-import { Trash2, Minus, Plus, Clock, Loader2, CheckCircle2, Tag, Clock4 } from 'lucide-react';
+import { Trash2, Minus, Plus, Clock, Loader2, CheckCircle2, Tag, Clock4, CalendarClock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { isWithinSchedule, SCHEDULE_TEXT } from '@/components/ScheduleBadge';
+import { isWithinSchedule, nextOpeningInstant, SCHEDULE_TEXT } from '@/components/ScheduleBadge';
 import { useTeacherArea } from '@/lib/TeacherAreaContext';
 
 const pickupOptions = ['Receso 1', 'Receso 2', 'Personalizado'];
@@ -14,6 +14,7 @@ export default function CheckoutPanel({ onDone, mobile, customerName: nameProp, 
   const { session } = useTeacherArea();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [scheduledAt, setScheduledAt] = useState(null);
   const [customTime, setCustomTime] = useState('');
   // Nombre y notas: estado local del panel (cada tecla solo re-renderiza
   // este formulario, no toda la página). La hoja móvil los pasa como
@@ -24,6 +25,11 @@ export default function CheckoutPanel({ onDone, mobile, customerName: nameProp, 
   const setCustomerName = onCustomerNameChange || setLocalName;
   const notes = notesProp !== undefined ? notesProp : localNotes;
   const setNotes = onNotesChange || setLocalNotes;
+
+  const open = isWithinSchedule();
+  // Fuera de horario: el pedido se programa para la próxima apertura (7:00 AM).
+  const nextOpen = open ? null : nextOpeningInstant();
+  const nextOpenLabel = nextOpen ? `${nextOpen.toLocaleDateString('es-MX', { weekday: 'long' })} 7:00 AM` : '';
 
   const handleConfirm = async () => {
     if (items.length === 0) return;
@@ -39,6 +45,11 @@ export default function CheckoutPanel({ onDone, mobile, customerName: nameProp, 
         customer_name: customerName || 'Estudiante',
         notes,
       };
+      if (!open) {
+        // Programar: la fecha objetivo se calcula en el cliente (su zona
+        // horaria) y el servidor solo acepta fechas válidas y futuras.
+        payload.scheduled_for = nextOpeningInstant().toISOString();
+      }
       if (session) {
         payload.teacher_token = session.token;
         payload.teacher_version = session.version;
@@ -48,6 +59,7 @@ export default function CheckoutPanel({ onDone, mobile, customerName: nameProp, 
       if (!d.ok) {
         throw new Error(d.error || 'order_failed');
       }
+      setScheduledAt(payload.scheduled_for ? new Date(payload.scheduled_for) : null);
       setSuccess(true);
       clearCart();
       setNotes('');
@@ -62,16 +74,18 @@ export default function CheckoutPanel({ onDone, mobile, customerName: nameProp, 
     }
   };
 
-  const open = isWithinSchedule();
-
   if (success) {
     return (
       <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
         <div className="grid place-items-center w-16 h-16 rounded-full bg-brand-light mb-4">
           <CheckCircle2 className="w-9 h-9 text-brand" />
         </div>
-        <h3 className="font-display font-700 text-[20px] text-foreground">¡Pedido confirmado!</h3>
-        <p className="text-[13px] text-muted-foreground mt-1.5">Recíbelo en {pickupTime === 'Personalizado' ? customTime : pickupTime}</p>
+        <h3 className="font-display font-700 text-[20px] text-foreground">{scheduledAt ? '¡Pedido programado!' : '¡Pedido confirmado!'}</h3>
+        <p className="text-[13px] text-muted-foreground mt-1.5">
+          {scheduledAt
+            ? `Lo prepararemos el ${scheduledAt.toLocaleDateString('es-MX', { weekday: 'long' })} 7:00 AM · Recoger en ${pickupTime === 'Personalizado' ? customTime : pickupTime}`
+            : `Recíbelo en ${pickupTime === 'Personalizado' ? customTime : pickupTime}`}
+        </p>
       </div>
     );
   }
@@ -117,7 +131,7 @@ export default function CheckoutPanel({ onDone, mobile, customerName: nameProp, 
       {items.length > 0 && !open && (
         <div className="mx-5 mt-3 px-3.5 py-3 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-2">
           <Clock4 className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-          <p className="text-[12px] text-amber-800 leading-relaxed">Estamos fuera de horario. Nuestro horario de atención es de {SCHEDULE_TEXT}.</p>
+          <p className="text-[12px] text-amber-800 leading-relaxed">Estamos fuera de horario ({SCHEDULE_TEXT}). Puedes programar tu pedido y lo prepararemos en el próximo horario.</p>
         </div>
       )}
 
@@ -162,11 +176,13 @@ export default function CheckoutPanel({ onDone, mobile, customerName: nameProp, 
             </div>
           </div>
 
-          <button onClick={handleConfirm} disabled={loading || !open}
+          <button onClick={handleConfirm} disabled={loading}
             className="w-full py-3.5 rounded-pill bg-brand text-white font-display font-700 text-[15px] hover:bg-brand-dark disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-            {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> Confirmando...</> : <><Tag className="w-4 h-4" /> {open ? 'Confirmar Pedido' : 'Fuera de horario'}</>}
+            {loading
+              ? <><Loader2 className="w-5 h-5 animate-spin" /> {open ? 'Confirmando...' : 'Programando...'}</>
+              : <>{open ? <Tag className="w-4 h-4" /> : <CalendarClock className="w-4 h-4" />} {open ? 'Confirmar Pedido' : 'Programar pedido'}</>}
           </button>
-          {!open && <p className="text-center text-[11px] text-muted-foreground">Reanudamos ventas a las 7:00 AM</p>}
+          {!open && <p className="text-center text-[11px] text-muted-foreground">Se preparará el {nextOpenLabel}</p>}
         </div>
       )}
     </div>
