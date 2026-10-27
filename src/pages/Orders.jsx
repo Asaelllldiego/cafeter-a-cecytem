@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
@@ -6,6 +6,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Clock, Package, CheckCircle2, ChefHat, Loader2, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import PullToRefresh from '@/components/PullToRefresh';
+import OrderProgress from '@/components/OrderProgress';
+import OrderStatusFilter from '@/components/OrderStatusFilter';
 
 const statusConfig = {
   pendiente: { label: 'Pendiente', icon: Clock, color: 'text-mustard-dark', bg: 'bg-mustard-light' },
@@ -18,12 +20,32 @@ const statusConfig = {
 export default function Orders() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [statusFilter, setStatusFilter] = useState('todos');
+
   const { data, isLoading: loading } = useQuery({
-    queryKey: ['myOrders', user?.id],
-    queryFn: () => base44.entities.Order.filter({ customer_user_id: user.id }, { sort: '-created_date', limit: 50 }).then(r => r.items || []),
+    queryKey: ['myOrders', user?.id, statusFilter],
+    queryFn: () => {
+      const query = statusFilter === 'todos'
+        ? { customer_user_id: user.id }
+        : { customer_user_id: user.id, status: statusFilter };
+      return base44.entities.Order.filter(query, { sort: '-created_date', limit: 50 }).then(r => r.items || []);
+    },
     enabled: !!user && user.role !== 'admin',
   });
   const orders = data || [];
+
+  // Avances en vivo: cualquier cambio de estado de mis pedidos
+  // (pendiente → en_preparacion → listo → entregado) refresca la lista.
+  useEffect(() => {
+    if (!user || user.role === 'admin') return;
+    const unsub = base44.entities.Order.subscribe((event) => {
+      if (event.type !== 'update' || !event.data) return;
+      const o = event.data;
+      if (o.customer_user_id !== user.id && o.created_by_id !== user.id) return;
+      queryClient.invalidateQueries({ queryKey: ['myOrders'] });
+    });
+    return unsub;
+  }, [user, queryClient]);
 
   // El administrador no usa la sección de pedidos personales
   if (user?.role === 'admin') return <Navigate to="/admin" replace />;
@@ -34,14 +56,27 @@ export default function Orders() {
       <h1 className="font-display font-700 text-[28px] lg:text-[32px] text-foreground mb-1">Mis Pedidos</h1>
       <p className="text-[14px] text-mutedink mb-6">Rastrea tus pedidos activos y programados</p>
 
+      {!loading && <OrderStatusFilter value={statusFilter} onChange={setStatusFilter} />}
+
       {loading ? (
         <div className="grid place-items-center py-20"><Loader2 className="w-7 h-7 animate-spin text-brand" /></div>
       ) : orders.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="text-5xl mb-3">📋</div>
-          <h3 className="font-display font-600 text-[18px] text-foreground">No tienes pedidos aún</h3>
-          <p className="text-[13px] text-mutedink mt-1">Cuando confirmes un pedido aparecerá aquí</p>
-        </div>
+        statusFilter === 'todos' ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="text-5xl mb-3">📋</div>
+            <h3 className="font-display font-600 text-[18px] text-foreground">No tienes pedidos aún</h3>
+            <p className="text-[13px] text-mutedink mt-1">Cuando confirmes un pedido aparecerá aquí</p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="text-3xl mb-2">🔍</div>
+            <p className="text-[13px] text-mutedink">No hay pedidos con este estado</p>
+            <button onClick={() => setStatusFilter('todos')}
+              className="mt-3 px-4 py-2 rounded-pill bg-brand text-white text-[12px] font-700">
+              Ver todos
+            </button>
+          </div>
+        )
       ) : (
         <div className="space-y-3">
           {orders.map(o => {
@@ -57,6 +92,8 @@ export default function Orders() {
                     {new Date(o.created_date).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })}
                   </span>
                 </div>
+
+                <OrderProgress status={o.status} />
 
                 <div className="flex items-center gap-2 mb-3">
                   <Clock className="w-4 h-4 text-mustard-dark" />
