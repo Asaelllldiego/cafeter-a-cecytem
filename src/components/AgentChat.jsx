@@ -19,6 +19,8 @@ export default function AgentChat() {
   const [loadingConv, setLoadingConv] = useState(false);
   const [convError, setConvError] = useState(false);
   const scrollRef = useRef(null);
+  // Mensaje escrito mientras la conversación aún carga: se envía solo al terminar.
+  const pendingRef = useRef(null);
 
   const loadConversation = useCallback(async () => {
     setLoadingConv(true);
@@ -37,6 +39,12 @@ export default function AgentChat() {
       setConv(null);
       setConvError(true);
       setMessages([{ role: 'assistant', content: GREETING }]);
+      // Si falló la carga con un mensaje en cola, se devuelve al campo
+      // para que no se pierda.
+      if (pendingRef.current) {
+        setInput(pendingRef.current);
+        pendingRef.current = null;
+      }
       return () => {};
     } finally {
       setLoadingConv(false);
@@ -61,12 +69,9 @@ export default function AgentChat() {
 
   const ready = !!conv && !loadingConv;
 
-  const send = async () => {
-    const text = input.trim();
-    if (!text || busy || !conv) return;
+  const doSend = async (text) => {
     const userMsg = { role: 'user', content: text };
     setMessages(prev => [...prev, userMsg]);
-    setInput('');
     setBusy(true);
     try {
       await base44.agents.addMessage(conv, { role: 'user', content: text });
@@ -82,6 +87,29 @@ export default function AgentChat() {
       setBusy(false);
     }
   };
+
+  const send = () => {
+    const text = input.trim();
+    if (!text || busy) return;
+    if (conv) {
+      setInput('');
+      doSend(text);
+      return;
+    }
+    // La conversación todavía carga: se guarda el mensaje y se envía
+    // automáticamente apenas esté lista (nada se pierde al teclear antes).
+    pendingRef.current = text;
+    setInput('');
+  };
+
+  // Cuando la conversación queda lista (o vuelve a estarlo tras reintentar),
+  // envía el mensaje encolado.
+  useEffect(() => {
+    if (!conv || busy || !pendingRef.current) return;
+    const text = pendingRef.current;
+    pendingRef.current = null;
+    doSend(text);
+  }, [conv, busy]);
 
   return (
     <>
@@ -139,10 +167,9 @@ export default function AgentChat() {
 
           <div className="flex items-center gap-2 px-3 py-2.5 border-t border-hair bg-card">
             <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()}
-              disabled={!ready}
               placeholder={ready ? 'Pregúntame por el menú...' : 'Cargando conversación...'}
-              className="flex-1 px-3.5 py-2.5 rounded-full border border-hair bg-background text-[13px] focus:outline-none focus:border-brand disabled:opacity-60" />
-            <button onClick={send} disabled={busy || !input.trim() || !ready}
+              className="flex-1 px-3.5 py-2.5 rounded-full border border-hair bg-background text-[13px] focus:outline-none focus:border-brand" />
+            <button onClick={send} disabled={busy || !input.trim()}
               className="grid place-items-center w-10 h-10 rounded-full bg-mustard text-onaccent hover:bg-mustard-dark hover:text-white disabled:opacity-50 active:scale-90 transition">
               <Send className="w-[18px] h-[18px]" />
             </button>
