@@ -8,6 +8,7 @@ import MobileCartBar from '@/components/MobileCartBar';
 import BottomNav from '@/components/BottomNav';
 import AgentChat from '@/components/AgentChat';
 import OrderAlerts from '@/components/OrderAlerts';
+import OrderReadyNotice from '@/components/OrderReadyNotice';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export default function Layout() {
@@ -40,6 +41,7 @@ export default function Layout() {
         {isMobile && <BottomNav />}
         {isMobile && <MobileCartBar />}
         <OrderAlerts />
+        <OrderReadyNotice />
         <AgentChat />
       </div>
     </CartProvider>

@@ -55,7 +55,13 @@ export default function Admin() {
   const setStatus = async (id, status) => {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
     try {
-      await base44.entities.Order.update(id, { status });
+      if (status === 'listo') {
+        // Al marcar como listo pasa por la función de servidor (markOrderReady),
+        // que valida el pedido y dispara el aviso al cliente en tiempo real.
+        await base44.functions.invoke('markOrderReady', { order_id: id });
+      } else {
+        await base44.entities.Order.update(id, { status });
+      }
       load();
     } catch (e) {
       console.error(e);
