@@ -53,25 +53,6 @@ export default function Login() {
         </>
       }
     >
-      <Button
-        variant="outline"
-        className="w-full h-12 text-sm font-medium mb-6"
-        onClick={handleGoogle}
-        style={{ display: 'none' }}
-      >
-        <GoogleIcon className="w-5 h-5 mr-2" />
-        Continuar con Google
-      </Button>
-
-      <div className="relative mb-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-3 text-muted-foreground">o</span>
-        </div>
-      </div>
-
       {error && (
         <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
           {error}
@@ -128,6 +109,24 @@ export default function Login() {
           )}
         </Button>
       </form>
+
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-border" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-card px-3 text-muted-foreground">o</span>
+        </div>
+      </div>
+
+      <Button
+        variant="outline"
+        className="w-full h-12 text-sm font-medium"
+        onClick={handleGoogle}
+      >
+        <GoogleIcon className="w-5 h-5 mr-2" />
+        Continuar con Google
+      </Button>
     </AuthLayout>
   );
 }
